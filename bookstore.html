@@ -468,19 +468,19 @@
   .dashboard-row .team { margin-top: 0; }
   @media (max-width: 1180px) { .dashboard-row { grid-template-columns: 1fr; } }
 
-  /* ---- team members ---- */
-  .team-cards { display: flex; flex-direction: column; gap: 8px; }
-  .team-card { display: flex; align-items: center; gap: 12px; padding: 10px 14px; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); border-radius: 14px; transition: 160ms ease; position: relative; }
-  .team-card:hover { background: rgba(255,255,255,0.09); }
-  .team-card .avatar-lg { width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; font-weight: 600; font-size: 14px; color: #fff; flex: 0 0 auto; border: 2px solid rgba(35,35,40,0.65); }
-  .team-card .tc-meta { flex: 1; min-width: 0; }
-  .team-card .tc-name { font-size: 13.5px; color: var(--text); font-weight: 500; }
-  .team-card .tc-status { font-size: 12px; color: var(--text-dim); margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .team-card .tc-status.empty { color: var(--text-faint); font-style: italic; }
-  .team-card .tc-edit { width: 24px; height: 24px; border-radius: 7px; background: rgba(255,255,255,0.06); border: 1px solid var(--glass-border); color: var(--text-dim); display: grid; place-items: center; cursor: pointer; padding: 0; flex: 0 0 auto; opacity: 0; transition: opacity 160ms ease; font-family: inherit; }
+  /* ---- team members (icons + status bubbles) ---- */
+  .team-cards { display: flex; flex-direction: row; gap: 14px; justify-content: space-around; padding: 40px 8px 8px; flex-wrap: wrap; }
+  .team-card { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 0; background: transparent; border: 0; position: relative; min-width: 0; transition: 160ms ease; flex: 0 0 auto; }
+  .team-card .tc-bubble { position: absolute; bottom: calc(100% + 10px); left: 50%; transform: translateX(-50%); padding: 6px 12px; background: rgba(255,255,255,0.10); border: 1px solid var(--glass-border); border-radius: 14px; backdrop-filter: blur(20px) saturate(140%); -webkit-backdrop-filter: blur(20px) saturate(140%); font-size: 11.5px; color: var(--text); max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.3; box-shadow: 0 4px 12px rgba(0,0,0,0.30); }
+  .team-card .tc-bubble::after { content: ''; position: absolute; top: 100%; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 5px solid transparent; border-right: 5px solid transparent; border-top: 6px solid rgba(255,255,255,0.10); }
+  .team-card .tc-bubble.empty { color: var(--text-faint); font-style: italic; }
+  .team-card .avatar-lg { width: 52px; height: 52px; border-radius: 50%; display: grid; place-items: center; font-weight: 600; font-size: 18px; color: #fff; flex: 0 0 auto; border: 2px solid rgba(35,35,40,0.65); transition: transform 160ms ease; box-shadow: 0 4px 10px rgba(0,0,0,0.25); }
+  .team-card:hover .avatar-lg { transform: translateY(-2px); }
+  .team-card .tc-name { font-size: 12px; color: var(--text-dim); font-weight: 500; text-align: center; }
+  .team-card .tc-edit { position: absolute; top: 38px; right: -6px; width: 22px; height: 22px; border-radius: 7px; background: rgba(40,40,45,0.92); border: 1px solid var(--glass-border); color: var(--text-dim); display: grid; place-items: center; cursor: pointer; padding: 0; opacity: 0; transition: opacity 160ms ease; font-family: inherit; z-index: 3; }
   .team-card:hover .tc-edit { opacity: 1; }
   .team-card .tc-edit:hover { background: var(--accent); border-color: var(--accent-strong); color: var(--text); }
-  .team-card .tc-edit svg { width: 12px; height: 12px; }
+  .team-card .tc-edit svg { width: 11px; height: 11px; }
 
   /* ---- team goals ---- */
   .goals { margin-top: 22px; }
@@ -948,6 +948,12 @@
   }
   .ml-item:hover .ml-arrow { opacity: 1; }
   .ml-item.active .ml-arrow { opacity: 1; color: var(--text); }
+  .ml-actions { display: none; gap: 4px; margin-left: 4px; flex: 0 0 auto; }
+  .ml-item:hover .ml-actions { display: flex; }
+  .ml-act { width: 24px; height: 24px; border-radius: 7px; background: rgba(255,255,255,0.08); border: 1px solid var(--glass-border); color: var(--text-dim); display: grid; place-items: center; cursor: pointer; padding: 0; flex: 0 0 auto; font-family: inherit; transition: 160ms ease; }
+  .ml-act:hover { background: rgba(255,255,255,0.18); color: var(--text); }
+  .ml-act svg { width: 12px; height: 12px; }
+  .ml-act.ml-del:hover { background: rgba(220,90,90,0.45); color: #fff; }
 
   .callout {
     border-radius: 12px;
@@ -1345,6 +1351,15 @@
   .field-group .inline-row { display: flex; gap: 8px; }
   .field-group .inline-row > * { flex: 1; }
 
+  /* checklist add button (dashed) */
+  .cl-add-wrap { margin-top: 8px; }
+  .cl-add-btn { width: 100%; padding: 8px 12px; background: transparent; border: 1px dashed var(--glass-border); border-radius: 10px; color: var(--text-faint); font-size: 13px; cursor: pointer; font-family: inherit; display: flex; align-items: center; justify-content: center; gap: 4px; transition: 160ms ease; }
+  .cl-add-btn:hover { border-color: var(--accent-strong); color: var(--text); background: rgba(255,255,255,0.04); }
+  .cl-add-btn .plus { font-size: 15px; line-height: 1; }
+  .cl-add-input { width: 100%; height: 36px; background: rgba(255,255,255,0.06); border: 1px solid var(--accent-strong); border-radius: 10px; color: var(--text); padding: 0 12px; font-size: 13px; font-family: inherit; outline: 0; }
+  .modal-card h3:empty { display: none; }
+  .modal-card .sub:empty { display: none; margin-bottom: 0; }
+  .modal-card.large { width: min(640px, 92%); padding: 28px 26px 22px; max-height: 85vh; overflow-y: auto; }
   /* checklist (goal expand modal) */
   .checklist { display: flex; flex-direction: column; gap: 4px; max-height: 280px; overflow-y: auto; padding: 4px 2px 8px; margin-top: 6px; }
   .checklist-row { display: flex; align-items: center; gap: 10px; padding: 6px 8px; border-radius: 8px; transition: 160ms ease; }
@@ -1403,8 +1418,10 @@
     display: flex;
     gap: 8px;
     justify-content: flex-end;
+    align-items: center;
     margin-top: 18px;
   }
+  .modal-foot .btn-danger { margin-right: auto; align-self: center; }
   .btn {
     height: 36px;
     padding: 0 16px;
@@ -2254,6 +2271,15 @@
         document.querySelectorAll('.view').forEach(function (v) {
           v.classList.toggle('active', v.id === viewId);
         });
+        var memoEl = document.querySelector('.memo');
+        var cardEl = document.querySelector('.card');
+        if (viewId === 'dashboardView') {
+          if (memoEl) memoEl.style.display = '';
+          if (cardEl) cardEl.style.gridTemplateColumns = '260px 1fr 340px';
+        } else {
+          if (memoEl) memoEl.style.display = 'none';
+          if (cardEl) cardEl.style.gridTemplateColumns = '260px 1fr';
+        }
         document.querySelectorAll('.sb-item.active').forEach(function (i) { i.classList.remove('active'); });
         state.sidebar.forEach(function (folder) {
           (folder.children || []).forEach(function (item) {
@@ -2298,9 +2324,10 @@
         var sorted = state.meetings.slice().sort(function (a, b) {
           return state.meetingSortDesc ? b.date.localeCompare(a.date) : a.date.localeCompare(b.date);
         });
-        if (!state.currentMeetingId || !state.meetings.find(function (m) { return m.id === state.currentMeetingId; })) {
-          state.currentMeetingId = sorted[0].id;
-          save(KEYS.currentMeeting, state.currentMeetingId);
+        // first entry: keep currentMeetingId as-is (closed if null). Invalid id is cleared but no auto-expand.
+        if (state.currentMeetingId && !state.meetings.find(function (m) { return m.id === state.currentMeetingId; })) {
+          state.currentMeetingId = null;
+          save(KEYS.currentMeeting, null);
         }
         sorted.forEach(function (mt) {
           var isActive = mt.id === state.currentMeetingId;
@@ -2321,6 +2348,27 @@
           if (mt.decisions && mt.decisions.length) statBits.push('결정 ' + mt.decisions.length);
           if (mt.issues && mt.issues.length) statBits.push('이슈 ' + mt.issues.length);
           item.appendChild(el('span', { 'class': 'ml-stats' }, statBits.join(' · ')));
+          var mlActs = el('div', { 'class': 'ml-actions' });
+          mlActs.appendChild(el('button', { type: 'button', 'class': 'ml-act ml-dup', title: '복사', onclick: function (e) {
+            e.stopPropagation();
+            var cp = JSON.parse(JSON.stringify(mt));
+            cp.id = uid('mt');
+            var nd = new Date(); cp.date = nd.getFullYear()+'-'+String(nd.getMonth()+1).padStart(2,'0')+'-'+String(nd.getDate()).padStart(2,'0');
+            cp.title = mt.title + ' (×­)­­'; cp.title = mt.title + ' (복사)';
+            state.meetings.push(cp);
+            state.currentMeetingId = cp.id;
+            save(KEYS.meetings, state.meetings); save(KEYS.currentMeeting, cp.id);
+            renderMeetings();
+          } }, [iconSvg(['M9 9h10v10H9z','M5 5h10v10H5z'])]));
+          mlActs.appendChild(el('button', { type: 'button', 'class': 'ml-act ml-del', title: '삭제', onclick: function (e) {
+            e.stopPropagation();
+            if (!confirm('"' + mt.title + '" 회의록을 삭제할까요?')) return;
+            state.meetings = state.meetings.filter(function (x) { return x.id !== mt.id; });
+            if (state.currentMeetingId === mt.id) { state.currentMeetingId = null; save(KEYS.currentMeeting, null); }
+            save(KEYS.meetings, state.meetings);
+            renderMeetings();
+          } }, [iconSvg(['M3 6h18','M8 6V4h8v2','M6 6l1 14h10l1-14'])]));
+          item.appendChild(mlActs);
           item.appendChild(el('span', { 'class': 'ml-arrow' }, isActive ? '▼' : '▶'));
           rowWrap.appendChild(item);
           if (isActive) {
@@ -2447,9 +2495,10 @@
 
         showModal({
           title: existing ? '회의록 편집' : '새 회의록',
-          sub: '필요한 부분만 입력해도 됩니다.',
+          sub: '"한 줄 = 한 항목" 서식 · 빈 칸은 생략',
           body: body,
           showDelete: !!existing,
+          wide: true,
           onDelete: function () {
             if (!confirm('이 회의록을 삭제할까요?')) return;
             state.meetings = state.meetings.filter(function (x) { return x.id !== seed.id; });
@@ -2503,15 +2552,13 @@
         var team = (typeof TEAM !== 'undefined' ? TEAM : ['고동기','이유민','전민욱']);
         team.forEach(function (name) {
           var status = (state.statuses && state.statuses[name]) || '';
-          var card = el('div', { 'class': 'team-card' });
+          var card = el('div', { 'class': 'team-card', title: name + (status ? ' — ' + status : '') });
+          card.appendChild(el('div', { 'class': 'tc-bubble' + (status ? '' : ' empty') }, status || '상태 메시지 없음'));
           card.appendChild(el('div', { 'class': 'avatar-lg ' + (AVATAR_CLS[name] || '') }, INITIAL[name] || (name[0] || '?')));
-          var meta = el('div', { 'class': 'tc-meta' });
-          meta.appendChild(el('div', { 'class': 'tc-name' }, name));
-          meta.appendChild(el('div', { 'class': 'tc-status' + (status ? '' : ' empty') }, status || '상태 메시지 없음'));
-          card.appendChild(meta);
+          card.appendChild(el('div', { 'class': 'tc-name' }, name));
           if (name === state.user) {
             var editBtn = el('button', { type: 'button', 'class': 'tc-edit', title: '내 상태 메시지 편집', onclick: function (e) { e.stopPropagation(); openStatusModal(name); } });
-            editBtn.appendChild(iconSvg(['M4 17.5V20h2.5L17 9.5 14.5 7 4 17.5z', 'M14 7l3 3']));
+            editBtn.appendChild(iconSvg(['M4 17.5V20h2.5L17 9.5 14.5 7 4 17.5z','M14 7l3 3']));
             card.appendChild(editBtn);
           }
           root.appendChild(card);
@@ -2519,7 +2566,7 @@
         if ($('teamBadge')) $('teamBadge').textContent = team.length;
       }
 
-      function openStatusModal(name) {
+            function openStatusModal(name) {
         var current = (state.statuses && state.statuses[name]) || '';
         var inp = document.createElement('input');
         inp.type = 'text'; inp.value = current; inp.placeholder = '오늘의 한줄 (예: 디자인 시스템 v2 작업)';
@@ -2556,7 +2603,7 @@
             g.progress = pct;
             auto = true;
           } else {
-            pct = Math.max(0, Math.min(100, g.progress || 0));
+            pct = 0; g.progress = 0;
           }
           var row = el('div', { 'class': 'goal-row', 'data-id': g.id, onclick: function () { openGoalDetailModal(g, false); } });
           var left = el('div', { 'class': 'gr-left' });
@@ -2678,19 +2725,36 @@
         clSection.appendChild(el('div', { 'class': 'gd-section-title' }, '체크리스트'));
         var listWrap = el('div', { 'class': 'checklist' });
         clSection.appendChild(listWrap);
-        var addInp = document.createElement('input');
-        addInp.type = 'text'; addInp.placeholder = '새 체크리스트 항목 Enter';
-        addInp.style.cssText = 'width:100%;height:34px;background:rgba(255,255,255,0.06);border:1px solid var(--glass-border);border-radius:10px;color:var(--text);padding:0 12px;font-size:13px;font-family:inherit;outline:0;margin-top:6px;';
-        addInp.addEventListener('keydown', function (e) {
-          if (e.key === 'Enter') {
-            e.preventDefault(); e.stopPropagation();
-            var v = (addInp.value || '').trim(); if (!v) return;
-            g.checklist.push({ id: uid('chk'), text: v, done: false });
-            addInp.value = '';
-            save(KEYS.goals, state.goals); renderChecklist(); refreshProgress(); renderGoals();
+        var addWrap = el('div', { 'class': 'cl-add-wrap' });
+        function showAddBtn() {
+          addWrap.innerHTML = '';
+          var btn = el('button', { type: 'button', 'class': 'cl-add-btn', onclick: function (e) { e.stopPropagation(); showAddInput(); } });
+          btn.appendChild(el('span', { 'class': 'plus' }, '+'));
+          btn.appendChild(el('span', null, ' 항목 추가'));
+          addWrap.appendChild(btn);
+        }
+        function showAddInput() {
+          addWrap.innerHTML = '';
+          var ip = document.createElement('input');
+          ip.type = 'text'; ip.placeholder = '항목 입력 (다른 곳 클릭/Enter 자동 저장)';
+          ip.className = 'cl-add-input';
+          var committed = false;
+          function commit() {
+            if (committed) return; committed = true;
+            var v = (ip.value || '').trim();
+            if (v) { g.checklist.push({ id: uid('chk'), text: v, done: false }); save(KEYS.goals, state.goals); renderChecklist(); refreshProgress(); renderGoals(); }
+            else { showAddBtn(); }
           }
-        });
-        clSection.appendChild(addInp);
+          ip.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') { e.preventDefault(); e.stopPropagation(); commit(); }
+            else if (e.key === 'Escape') { e.preventDefault(); committed = true; showAddBtn(); }
+          });
+          ip.addEventListener('blur', function () { setTimeout(commit, 0); });
+          addWrap.appendChild(ip);
+          ip.focus();
+        }
+        showAddBtn();
+        clSection.appendChild(addWrap);
         body.appendChild(clSection);
         function refreshProgress() {
           var pct;
@@ -2744,8 +2808,8 @@
         refreshProgress();
         applyEditingMode();
         showModal({
-          title: '목표 상세',
-          sub: editing ? '수정 모드 — 제목/참여자/체크리스트 바로 수정 가능' : '좌측 연필로 수정 모드 전환',
+          title: '',
+          sub: '',
           body: body, showDelete: true,
           onDelete: function () { if (confirm('"' + g.name + '" 목표를 삭제할까요?')) { state.goals = state.goals.filter(function (x) { return x.id !== g.id; }); save(KEYS.goals, state.goals); renderGoals(); hideModal(); } },
           onSave: hideModal
@@ -3054,6 +3118,8 @@
         if (opts.body) body.appendChild(opts.body);
         var del = $('modalDelete');
         del.style.display = opts.showDelete ? 'inline-flex' : 'none';
+        var mc = document.querySelector('#modal .modal-card');
+        if (mc) mc.classList.toggle('large', !!opts.wide);
         $('modal').classList.add('show');
       }
       function hideModal() {
