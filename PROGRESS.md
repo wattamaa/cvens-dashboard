@@ -547,6 +547,16 @@ state.events = state.events.map(e => {
 - **배경**: 보라 제거. 회색 spot + 0.012 white noise + #0b0b10 → #040406.
 - **전역 검색**: #searchResults dropdown. buildSearchResults—ql/goals(+checklist)/events/memos(+replies)/sidebar/meetings(전필드)/statuses. gotoSearchTarget — setView + ml-item auto-expand + #goals auto-open + scrollIntoView center + 3초 .search-highlight outline+pulse. 외부클릭 닫힘.
 
+### 22단계: 팀목표 리스트화 + 자동 진행률 + 인라인 편집 + 타임라인 보드 인터랙션 (commit 400cb41)
+> "팀목표 자를리면 리스트 형태로 / 바그래프는 체크리스트 진행 자동 / 클릭하면 상세보기 + 수정버튼으로 제목/참여자/체크리스트 섭션별 수정 / 메모는 pip 창 안 뜨고 그 자리에서 바로 수정 / 담당자는 우상단 알림 옆 + 타임라인 보드를 클릭해서 늘리고 줄이고 추가
+- **팀 목표 리스트화**: deck/2-col 카드 구조 → 수직 list (.goals-list/.goal-row). 이름 잘림 없음. 행 구성: 이름+진행바 / % / 아바타 / 연필
+- **자동 진행률**: state.goals[i].checklist 있으면 progress=done/total*100 (수동값 덮어씬). 비어있으면 기존 g.progress. % 텍스트에 .auto 클래스 (섬세한 색 구분)
+- **상세보기 모달 (openGoalDetailModal)**: 제목 + 진행도 + 참여자 + 체크리스트. 우상단 연필 토글 → 제목 input + 참여자 toggle chip + 체크리스트 항목 inline input (일반 모드에서는 read-only). 체크 시 자동 재계산.
+- **메모 인라인 편집 (startMemoInlineEdit)**: 편집 버튼 → bubble 내부 텍스트 노드를 textarea로 교체. Enter 저장 / Shift+Enter 줄바꿈 / Esc 취소 / blur commit. 그 사이 b-actions/reply-btn/b-replies 숨김.
+- **Topbar user chip**: connDot 다음 자리에 #userChip 추가 (아바타+이름). 클릭 → showPicker. memo-head의 me-chip 제거. picker click → renderUserChip() + renderMemos + renderTeam.
+- **타임라인 드래그 핸들**: 각 .t-bar에 .t-handle.t-handle-l/-r 6px (hover시 표시). mousedown→document mousemove/up 사용. left/width % 조정 후 mouseup으로 date 환산 + state.events save + renderTimeline. .dragging 클래스 노란 outline
+- **타임라인 새 일정 버튼**: 마지막 줄 .t-row.t-row-add — 클릭시 today↝+7일 새 ev push + openEventModal.
+
 ---
 
-마지막 업데이트: 21단계 대시보드 재조정 완료 (퀸링크/팀목표/팀원구성/타임라인줌/메모대댓글/전역검색/스크롤바/배경).
+마지막 업데이트: 22단계 팀목표리스트화/자동진행률/상세인라인/메모인라인/user chip/타임라인드래그핸들+추가 완료.
