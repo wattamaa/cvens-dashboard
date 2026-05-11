@@ -535,6 +535,18 @@ state.events = state.events.map(e => {
 - 회의 장소: 내부 회의실
 - Notion 스타일 회의록 포맷 사용 (5종 컬러 callout: 회색·파랑·빨강·갈색·초록)
 
+### 21단계: 대시보드 재조정 (commit c7f6371)
+> Quick Links 더미 1개 + 항상 +버튼 / 팀목표 작게+펼침+체크리스트 / 팀원구성(좌) | 팀목표(우) / 타임라인 줌 / 메모 대댓글 / 글라스 스크롤바 + 어두운 미니멀 배경 / 전역 검색 실시간+이동+3초 하이라이트
+- **Quick Links**: DEFAULT 1개로 축소. 섹션 +버튼 항상 보이게. Firebase /cvens/quicklinks 도 1개 reset.
+- **팀 목표**: HTML 기본 open 클래스 + 카드 142→96px, pct 38→26px. 카드 클릭 → openGoalChecklistModal. state.goals[i].checklist 마이그레이션. 체크 시 progress 자동 재계산. 연필 버튼 항상.
+- **팀원 구성**: 신규 state.statuses + cv_statuses + Firebase /cvens/statuses. renderTeam, openStatusModal (본인만 편집).
+- **배치**: <div class="dashboard-row"> 2-col grid — 좌 팀원/우 팀목표. <=1180px stack.
+- **타임라인 줌**: toolbar -/+ 버튼. zoomTimeline(factor) today 기준. 라벨 적응형 (≤ 18일 일별 / ≤ 75일 주별 / else 월별).
+- **메모 대댓글**: replies 스키마 마이그레이션. .reply-btn toggle, b-reply-input. renderMemos 재작성.
+- **글라스 스크롤바**: webkit 10px + firefox thin, 반투명 thumb.
+- **배경**: 보라 제거. 회색 spot + 0.012 white noise + #0b0b10 → #040406.
+- **전역 검색**: #searchResults dropdown. buildSearchResults—ql/goals(+checklist)/events/memos(+replies)/sidebar/meetings(전필드)/statuses. gotoSearchTarget — setView + ml-item auto-expand + #goals auto-open + scrollIntoView center + 3초 .search-highlight outline+pulse. 외부클릭 닫힘.
+
 ---
 
-마지막 업데이트: 18단계 응급+잡결함(8개) + 19단계 타임라인 노션스타일 + 20단계 회의록 accordion 환자 완료.
+마지막 업데이트: 21단계 대시보드 재조정 완료 (퀸링크/팀목표/팀원구성/타임라인줌/메모대댓글/전역검색/스크롤바/배경).
