@@ -960,25 +960,38 @@
   }
   .ml-item:hover .ml-arrow { opacity: 1; }
   .ml-item.active .ml-arrow { opacity: 1; color: var(--text); }
-  /* meeting folder cards */
-  .meeting-folders { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
-  .mt-folder-group { display: flex; flex-direction: column; }
-  .mt-folder-head { display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); border-radius: 14px; cursor: pointer; transition: 160ms ease; }
-  .mt-folder-head:hover { background: rgba(255,255,255,0.09); border-color: var(--glass-border-strong); }
-  .mt-folder-group.expanded .mt-folder-head { border-bottom-left-radius: 0; border-bottom-right-radius: 0; }
-  .mt-folder-head .chev { width: 14px; height: 14px; color: var(--text-dim); transition: transform 200ms ease; flex: 0 0 auto; }
-  .mt-folder-group.expanded .mt-folder-head .chev { transform: rotate(90deg); }
-  .mt-folder-head .ic { font-size: 16px; flex: 0 0 auto; }
-  .mt-folder-head .name { flex: 1; font-size: 13.5px; color: var(--text); font-weight: 500; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .mt-folder-head .count { font-size: 11.5px; color: var(--text-dim); background: rgba(255,255,255,0.08); padding: 2px 8px; border-radius: 999px; flex: 0 0 auto; }
-  .mt-folder-actions { display: none; gap: 4px; flex: 0 0 auto; }
-  .mt-folder-head:hover .mt-folder-actions { display: flex; }
-  .mt-folder-act { width: 24px; height: 24px; border-radius: 7px; background: rgba(255,255,255,0.08); border: 1px solid var(--glass-border); color: var(--text-dim); display: grid; place-items: center; cursor: pointer; padding: 0; font-family: inherit; }
+  /* meeting folder cards (grid) */
+  .meeting-folders-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; margin-bottom: 16px; }
+  .mt-folder-card { padding: 14px 16px; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); border-radius: 16px; cursor: pointer; min-height: 96px; display: flex; flex-direction: column; gap: 8px; transition: 160ms ease; position: relative; }
+  .mt-folder-card:hover { background: rgba(255,255,255,0.09); transform: translateY(-2px); }
+  .mt-folder-card.dragover { background: rgba(120,160,220,0.20); border-color: var(--accent-strong); transform: translateY(-2px); box-shadow: 0 8px 20px rgba(120,160,220,0.25); }
+  .mt-folder-card.expanded { grid-column: 1 / -1; transform: none; cursor: default; min-height: 96px; }
+  .mt-folder-card.expanded:hover { transform: none; background: rgba(255,255,255,0.05); }
+  .mt-folder-card-head { display: flex; align-items: center; gap: 10px; }
+  .mt-folder-card .ic { font-size: 22px; flex: 0 0 auto; }
+  .mt-folder-card .name { flex: 1; font-size: 14px; font-weight: 500; color: var(--text); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .mt-folder-card .count { font-size: 11.5px; color: var(--text-dim); background: rgba(255,255,255,0.08); padding: 2px 8px; border-radius: 999px; flex: 0 0 auto; }
+  .mt-folder-actions { position: absolute; top: 8px; right: 8px; display: none; gap: 4px; }
+  .mt-folder-card:hover .mt-folder-actions { display: flex; }
+  .mt-folder-act { width: 24px; height: 24px; border-radius: 7px; background: rgba(40,40,45,0.85); border: 1px solid var(--glass-border); color: var(--text-dim); display: grid; place-items: center; cursor: pointer; padding: 0; font-family: inherit; }
   .mt-folder-act:hover { background: rgba(255,255,255,0.18); color: var(--text); }
   .mt-folder-act svg { width: 11px; height: 11px; }
-  .mt-folder-act.danger:hover { background: rgba(220,90,90,0.45); color: #fff; }
-  .mt-folder-body { display: none; padding: 6px; background: rgba(255,255,255,0.02); border: 1px solid var(--glass-border); border-top: 0; border-radius: 0 0 14px 14px; margin-top: -1px; }
-  .mt-folder-group.expanded .mt-folder-body { display: flex; flex-direction: column; gap: 6px; }
+  .mt-folder-act.danger:hover { background: rgba(220,90,90,0.55); color: #fff; }
+  .mt-folder-card .mt-folder-body { display: none; }
+  .mt-folder-card.expanded .mt-folder-body { display: flex; flex-direction: column; gap: 6px; margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.08); }
+  /* misc / unfiled drop zone */
+  .mt-misc-wrap { background: rgba(255,255,255,0.02); border: 1px dashed var(--glass-border); border-radius: 14px; padding: 12px; transition: 160ms ease; }
+  .mt-misc-wrap.dragover { background: rgba(120,160,220,0.12); border-color: var(--accent-strong); border-style: solid; }
+  .mt-misc-title { font-size: 11.5px; color: var(--text-dim); font-weight: 500; margin-bottom: 8px; padding: 0 4px; text-transform: uppercase; letter-spacing: 0.06em; }
+  .mt-misc-body { display: flex; flex-direction: column; gap: 6px; }
+  /* drag/drop visuals on ml-item */
+  .ml-item { transition: 160ms ease; }
+  .ml-item.dragging { opacity: 0.5; }
+  .ml-item[draggable] { cursor: grab; }
+  .ml-item[draggable]:active { cursor: grabbing; }
+  .ml-title[contenteditable] { outline: 0; padding: 2px 6px; margin: -2px -6px; border-radius: 4px; transition: background 160ms; }
+  .ml-title[contenteditable]:hover { background: rgba(255,255,255,0.05); }
+  .ml-title[contenteditable]:focus { background: rgba(255,255,255,0.10); outline: 1px solid var(--accent-strong); }
   .mt-folder-empty { padding: 12px 14px; color: var(--text-faint); font-size: 12.5px; font-style: italic; text-align: center; }
   .ml-folder-select { background: rgba(255,255,255,0.08); border: 1px solid var(--glass-border); color: var(--text); border-radius: 6px; font-size: 11px; padding: 2px 6px; cursor: pointer; font-family: inherit; outline: 0; color-scheme: dark; max-width: 100px; }
   .ml-folder-select option { background: #2a2a30; }
@@ -2308,45 +2321,42 @@
       function renderMeetingRow(mt, container) {
         var isActive = mt.id === state.currentMeetingId;
         var rowWrap = el('div', { 'class': 'ml-row' + (isActive ? ' active' : '') });
-        var item = el('div', { 'class': 'ml-item' + (isActive ? ' active' : ''), 'data-id': mt.id, onclick: function () {
+        var item = el('div', { 'class': 'ml-item' + (isActive ? ' active' : ''), 'data-id': mt.id });
+        item.draggable = true;
+        item.addEventListener('click', function (e) {
+          if (e.target.closest('.ml-actions') || e.target.closest('[contenteditable]')) return;
           if (state.currentMeetingId === mt.id) state.currentMeetingId = null;
           else state.currentMeetingId = mt.id;
           save(KEYS.currentMeeting, state.currentMeetingId);
           renderMeetings();
-        } });
+        });
+        item.addEventListener('dragstart', function (e) { e.dataTransfer.setData('text/plain', mt.id); e.dataTransfer.effectAllowed = 'move'; item.classList.add('dragging'); });
+        item.addEventListener('dragend', function () { item.classList.remove('dragging'); });
         item.appendChild(el('span', { 'class': 'ml-date' }, fmtMeetingDateLabel(mt.date)));
-        item.appendChild(el('span', { 'class': 'ml-title' }, mt.title || '제목 없음'));
+        var titleEl = el('span', { 'class': 'ml-title' }, mt.title || '제목 없음');
+        titleEl.contentEditable = 'true';
+        titleEl.spellcheck = false;
+        titleEl.setAttribute('data-editable', '1');
+        var origT = mt.title || '';
+        titleEl.addEventListener('focus', function () { origT = titleEl.textContent; });
+        titleEl.addEventListener('click', function (e) { e.stopPropagation(); });
+        titleEl.addEventListener('mousedown', function (e) { e.stopPropagation(); });
+        titleEl.addEventListener('keydown', function (e) {
+          if (e.key === 'Enter') { e.preventDefault(); titleEl.blur(); }
+          else if (e.key === 'Escape') { e.preventDefault(); titleEl.textContent = origT; titleEl.blur(); }
+        });
+        titleEl.addEventListener('blur', function () {
+          var v = (titleEl.textContent || '').trim();
+          if (v !== (mt.title || '')) { mt.title = v; save(KEYS.meetings, state.meetings); renderMeetings(); }
+        });
+        item.appendChild(titleEl);
         var statBits = ['참석 ' + ((mt.attendees || []).length)];
         if (mt.decisions && mt.decisions.length) statBits.push('결정 ' + mt.decisions.length);
         if (mt.issues && mt.issues.length) statBits.push('이슈 ' + mt.issues.length);
         item.appendChild(el('span', { 'class': 'ml-stats' }, statBits.join(' · ')));
         var mlActs = el('div', { 'class': 'ml-actions' });
-        var sel = document.createElement('select');
-        sel.className = 'ml-folder-select';
-        sel.title = '폴더 지정';
-        sel.addEventListener('click', function (e) { e.stopPropagation(); });
-        sel.addEventListener('change', function (e) { e.stopPropagation(); mt.folderId = sel.value || null; save(KEYS.meetings, state.meetings); renderMeetings(); });
-        var noneOpt = document.createElement('option'); noneOpt.value = ''; noneOpt.textContent = '미분류'; sel.appendChild(noneOpt);
-        (state.meetingFolders || []).forEach(function (f) { var o = document.createElement('option'); o.value = f.id; o.textContent = f.name; sel.appendChild(o); });
-        sel.value = mt.folderId || '';
-        mlActs.appendChild(sel);
-        mlActs.appendChild(el('button', { type: 'button', 'class': 'ml-act ml-dup', title: '복사', onclick: function (e) {
-          e.stopPropagation();
-          var cp = JSON.parse(JSON.stringify(mt)); cp.id = uid('mt');
-          var nd = new Date(); cp.date = nd.getFullYear()+'-'+String(nd.getMonth()+1).padStart(2,'0')+'-'+String(nd.getDate()).padStart(2,'0');
-          cp.title = (mt.title || '회의록') + ' (복사)';
-          state.meetings.push(cp); state.currentMeetingId = cp.id;
-          save(KEYS.meetings, state.meetings); save(KEYS.currentMeeting, cp.id);
-          renderMeetings();
-        } }, [iconSvg(['M9 9h10v10H9z','M5 5h10v10H5z'])]));
-        mlActs.appendChild(el('button', { type: 'button', 'class': 'ml-act ml-del', title: '삭제', onclick: function (e) {
-          e.stopPropagation();
-          if (!confirm('"' + (mt.title || '회의록') + '" 회의록을 삭제할까요?')) return;
-          state.meetings = state.meetings.filter(function (x) { return x.id !== mt.id; });
-          if (state.currentMeetingId === mt.id) { state.currentMeetingId = null; save(KEYS.currentMeeting, null); }
-          save(KEYS.meetings, state.meetings);
-          renderMeetings();
-        } }, [iconSvg(['M3 6h18','M8 6V4h8v2','M6 6l1 14h10l1-14'])]));
+        mlActs.appendChild(el('button', { type: 'button', 'class': 'ml-act ml-dup', title: '복사', onclick: function (e) { e.stopPropagation(); var cp = JSON.parse(JSON.stringify(mt)); cp.id = uid('mt'); var nd = new Date(); cp.date = nd.getFullYear()+'-'+String(nd.getMonth()+1).padStart(2,'0')+'-'+String(nd.getDate()).padStart(2,'0'); cp.title = (mt.title || '회의록') + ' (복사)'; state.meetings.push(cp); state.currentMeetingId = cp.id; save(KEYS.meetings, state.meetings); save(KEYS.currentMeeting, cp.id); renderMeetings(); } }, [iconSvg(['M9 9h10v10H9z','M5 5h10v10H5z'])]));
+        mlActs.appendChild(el('button', { type: 'button', 'class': 'ml-act ml-del', title: '삭제', onclick: function (e) { e.stopPropagation(); if (!confirm('"' + (mt.title || '회의록') + '" 회의록을 삭제할까요?')) return; state.meetings = state.meetings.filter(function (x) { return x.id !== mt.id; }); if (state.currentMeetingId === mt.id) { state.currentMeetingId = null; save(KEYS.currentMeeting, null); } save(KEYS.meetings, state.meetings); renderMeetings(); } }, [iconSvg(['M3 6h18','M8 6V4h8v2','M6 6l1 14h10l1-14'])]));
         item.appendChild(mlActs);
         item.appendChild(el('span', { 'class': 'ml-arrow' }, isActive ? '▼' : '▶'));
         rowWrap.appendChild(item);
@@ -2360,46 +2370,53 @@
         $('sortMeetingBtn').textContent = state.meetingSortDesc ? '최신순 ↓' : '오래된순 ↑';
         $('meetingTitle').textContent = '회의록';
         var folders = state.meetingFolders || [];
-        if (!state.meetings.length && !folders.length) {
-          listEl.appendChild(el('div', { 'class': 'ml-empty' }, '아직 회의록이 없습니다. 우측 + 버튼으로 새 회의를 추가하세요.'));
-          return;
-        }
+        if (!state.meetings.length && !folders.length) { listEl.appendChild(el('div', { 'class': 'ml-empty' }, '아직 회의록이 없습니다. 우측 + 버튼으로 새 회의를 추가하세요.')); return; }
         if (state.currentMeetingId && !state.meetings.find(function (m) { return m.id === state.currentMeetingId; })) { state.currentMeetingId = null; save(KEYS.currentMeeting, null); }
         var sortFn = function (a, b) { return state.meetingSortDesc ? b.date.localeCompare(a.date) : a.date.localeCompare(b.date); };
-        folders.forEach(function (folder) {
-          var group = el('div', { 'class': 'mt-folder-group' + (folder.expanded ? ' expanded' : '') });
-          var head = el('div', { 'class': 'mt-folder-head', onclick: function (e) { if (e.target.closest('.mt-folder-actions')) return; folder.expanded = !folder.expanded; group.classList.toggle('expanded'); save(KEYS.meetingFolders, state.meetingFolders); } });
-          var chev = iconSvg('M9 6l6 6-6 6'); chev.classList.add('chev'); head.appendChild(chev);
-          head.appendChild(el('span', { 'class': 'ic' }, '📁'));
-          head.appendChild(el('span', { 'class': 'name' }, folder.name));
-          var members = state.meetings.filter(function (m) { return m.folderId === folder.id; });
-          head.appendChild(el('span', { 'class': 'count' }, members.length + '건'));
-          var actions = el('div', { 'class': 'mt-folder-actions' });
-          actions.appendChild(el('button', { type: 'button', 'class': 'mt-folder-act', title: '이름 변경', onclick: function (e) { e.stopPropagation(); var nm = prompt('폴더 이름:', folder.name); if (nm !== null && nm.trim()) { folder.name = nm.trim(); save(KEYS.meetingFolders, state.meetingFolders); renderMeetings(); } } }, [iconSvg(['M4 17.5V20h2.5L17 9.5 14.5 7 4 17.5z','M14 7l3 3'])]));
-          actions.appendChild(el('button', { type: 'button', 'class': 'mt-folder-act danger', title: '삭제', onclick: function (e) { e.stopPropagation(); if (!confirm('"' + folder.name + '" 폴더를 삭제할까요? 안 회의들은 미분류로 이동됩니다.')) return; state.meetings.forEach(function (m) { if (m.folderId === folder.id) m.folderId = null; }); state.meetingFolders = state.meetingFolders.filter(function (x) { return x.id !== folder.id; }); save(KEYS.meetings, state.meetings); save(KEYS.meetingFolders, state.meetingFolders); renderMeetings(); } }, [iconSvg(['M3 6h18','M8 6V4h8v2','M6 6l1 14h10l1-14'])]));
-          head.appendChild(actions);
-          group.appendChild(head);
-          var body = el('div', { 'class': 'mt-folder-body' });
-          if (members.length === 0) body.appendChild(el('div', { 'class': 'mt-folder-empty' }, '이 폴더에 회의록이 없습니다.'));
-          else members.slice().sort(sortFn).forEach(function (mt) { renderMeetingRow(mt, body); });
-          group.appendChild(body);
-          listEl.appendChild(group);
-        });
+        if (folders.length) {
+          var grid = el('div', { 'class': 'meeting-folders-grid' });
+          folders.forEach(function (folder) {
+            var members = state.meetings.filter(function (m) { return m.folderId === folder.id; });
+            var card = el('div', { 'class': 'mt-folder-card' + (folder.expanded ? ' expanded' : ''), 'data-id': folder.id });
+            var head = el('div', { 'class': 'mt-folder-card-head', onclick: function (e) {
+              if (e.target.closest('.mt-folder-actions')) return;
+              folders.forEach(function (f) { if (f.id !== folder.id) f.expanded = false; });
+              folder.expanded = !folder.expanded;
+              save(KEYS.meetingFolders, state.meetingFolders);
+              renderMeetings();
+            } });
+            head.appendChild(el('span', { 'class': 'ic' }, '📁'));
+            head.appendChild(el('div', { 'class': 'name' }, folder.name));
+            head.appendChild(el('div', { 'class': 'count' }, members.length + '건'));
+            card.appendChild(head);
+            var actions = el('div', { 'class': 'mt-folder-actions' });
+            actions.appendChild(el('button', { type: 'button', 'class': 'mt-folder-act', title: '이름 변경', onclick: function (e) { e.stopPropagation(); var nm = prompt('폴더 이름:', folder.name); if (nm !== null && nm.trim()) { folder.name = nm.trim(); save(KEYS.meetingFolders, state.meetingFolders); renderMeetings(); } } }, [iconSvg(['M4 17.5V20h2.5L17 9.5 14.5 7 4 17.5z','M14 7l3 3'])]));
+            actions.appendChild(el('button', { type: 'button', 'class': 'mt-folder-act danger', title: '삭제', onclick: function (e) { e.stopPropagation(); if (!confirm('"' + folder.name + '" 폴더를 삭제할까요? 안 회의들은 미분류로 이동됩니다.')) return; state.meetings.forEach(function (m) { if (m.folderId === folder.id) m.folderId = null; }); state.meetingFolders = state.meetingFolders.filter(function (x) { return x.id !== folder.id; }); save(KEYS.meetings, state.meetings); save(KEYS.meetingFolders, state.meetingFolders); renderMeetings(); } }, [iconSvg(['M3 6h18','M8 6V4h8v2','M6 6l1 14h10l1-14'])]));
+            card.appendChild(actions);
+            var body = el('div', { 'class': 'mt-folder-body' });
+            if (members.length === 0) body.appendChild(el('div', { 'class': 'mt-folder-empty' }, '이 폴더에 회의록이 없습니다. 회의록을 끌어서 옥기세요.'));
+            else members.slice().sort(sortFn).forEach(function (mt) { renderMeetingRow(mt, body); });
+            card.appendChild(body);
+            card.addEventListener('dragover', function (e) { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; card.classList.add('dragover'); });
+            card.addEventListener('dragleave', function (e) { if (!card.contains(e.relatedTarget)) card.classList.remove('dragover'); });
+            card.addEventListener('drop', function (e) { e.preventDefault(); card.classList.remove('dragover'); var mtId = e.dataTransfer.getData('text/plain'); var mt = state.meetings.find(function (m) { return m.id === mtId; }); if (mt) { mt.folderId = folder.id; save(KEYS.meetings, state.meetings); renderMeetings(); } });
+            grid.appendChild(card);
+          });
+          listEl.appendChild(grid);
+        }
         var unfiled = state.meetings.filter(function (m) { return !m.folderId || !folders.find(function (f) { return f.id === m.folderId; }); });
-        if (folders.length === 0) {
-          unfiled.slice().sort(sortFn).forEach(function (mt) { renderMeetingRow(mt, listEl); });
-        } else if (unfiled.length > 0) {
-          var miscGroup = el('div', { 'class': 'mt-folder-group expanded' });
-          var miscHead = el('div', { 'class': 'mt-folder-head', onclick: function () { miscGroup.classList.toggle('expanded'); } });
-          var miscChev = iconSvg('M9 6l6 6-6 6'); miscChev.classList.add('chev'); miscHead.appendChild(miscChev);
-          miscHead.appendChild(el('span', { 'class': 'ic' }, '📂'));
-          miscHead.appendChild(el('span', { 'class': 'name' }, '미분류'));
-          miscHead.appendChild(el('span', { 'class': 'count' }, unfiled.length + '건'));
-          miscGroup.appendChild(miscHead);
-          var miscBody = el('div', { 'class': 'mt-folder-body' });
-          unfiled.slice().sort(sortFn).forEach(function (mt) { renderMeetingRow(mt, miscBody); });
-          miscGroup.appendChild(miscBody);
-          listEl.appendChild(miscGroup);
+        if (folders.length === 0) { unfiled.slice().sort(sortFn).forEach(function (mt) { renderMeetingRow(mt, listEl); }); }
+        else {
+          var miscWrap = el('div', { 'class': 'mt-misc-wrap' });
+          miscWrap.appendChild(el('div', { 'class': 'mt-misc-title' }, '📂 미분류 (' + unfiled.length + '건)'));
+          var miscBody = el('div', { 'class': 'mt-misc-body' });
+          if (unfiled.length === 0) miscBody.appendChild(el('div', { 'class': 'mt-folder-empty' }, '끌어서 이동해보세요.'));
+          else unfiled.slice().sort(sortFn).forEach(function (mt) { renderMeetingRow(mt, miscBody); });
+          miscWrap.appendChild(miscBody);
+          miscWrap.addEventListener('dragover', function (e) { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; miscWrap.classList.add('dragover'); });
+          miscWrap.addEventListener('dragleave', function (e) { if (!miscWrap.contains(e.relatedTarget)) miscWrap.classList.remove('dragover'); });
+          miscWrap.addEventListener('drop', function (e) { e.preventDefault(); miscWrap.classList.remove('dragover'); var mtId = e.dataTransfer.getData('text/plain'); var mt = state.meetings.find(function (m) { return m.id === mtId; }); if (mt) { mt.folderId = null; save(KEYS.meetings, state.meetings); renderMeetings(); } });
+          listEl.appendChild(miscWrap);
         }
       }
 
