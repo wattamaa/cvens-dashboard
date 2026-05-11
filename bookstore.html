@@ -1987,6 +1987,17 @@
       // migrate quick links: ensure url field exists
       state.ql = state.ql.map(function (q) { if (q.url === undefined) q.url = ''; return q; });
       save(KEYS.ql, state.ql);
+      // migrate meetings: rules + h2 default fields
+      state.meetings = state.meetings.map(function (m) {
+        if (!m.rules) m.rules = [
+          '미팅 아젠다 및 개인 이슈들은 회의 전에 모두 기재 부탁드립니다.',
+          '미팅은 특이사항 없으면 10:30분 고정 진행 됩니다.',
+          '미팅 소요시간은 30-60분 입니다'
+        ];
+        if (m.h2 === undefined) m.h2 = '중요하게 공유하실 사항 있으시면 기재 부탁드립니다';
+        return m;
+      });
+      save(KEYS.meetings, state.meetings);
             state.events = state.events.map(function (e) {
         if (e.date && !e.start) {
           return { id: e.id, title: e.title, category: e.category, start: e.date, end: e.date };
@@ -2373,51 +2384,39 @@
         if (!state.meetings.length && !folders.length) { listEl.appendChild(el('div', { 'class': 'ml-empty' }, '아직 회의록이 없습니다. 우측 + 버튼으로 새 회의를 추가하세요.')); return; }
         if (state.currentMeetingId && !state.meetings.find(function (m) { return m.id === state.currentMeetingId; })) { state.currentMeetingId = null; save(KEYS.currentMeeting, null); }
         var sortFn = function (a, b) { return state.meetingSortDesc ? b.date.localeCompare(a.date) : a.date.localeCompare(b.date); };
-        if (folders.length) {
-          var grid = el('div', { 'class': 'meeting-folders-grid' });
-          folders.forEach(function (folder) {
-            var members = state.meetings.filter(function (m) { return m.folderId === folder.id; });
-            var card = el('div', { 'class': 'mt-folder-card' + (folder.expanded ? ' expanded' : ''), 'data-id': folder.id });
-            var head = el('div', { 'class': 'mt-folder-card-head', onclick: function (e) {
-              if (e.target.closest('.mt-folder-actions')) return;
-              folders.forEach(function (f) { if (f.id !== folder.id) f.expanded = false; });
-              folder.expanded = !folder.expanded;
-              save(KEYS.meetingFolders, state.meetingFolders);
-              renderMeetings();
-            } });
-            head.appendChild(el('span', { 'class': 'ic' }, '📁'));
-            head.appendChild(el('div', { 'class': 'name' }, folder.name));
-            head.appendChild(el('div', { 'class': 'count' }, members.length + '건'));
-            card.appendChild(head);
+        var unfiled = state.meetings.filter(function (m) { return !m.folderId || !folders.find(function (f) { return f.id === m.folderId; }); });
+        var grid = el('div', { 'class': 'meeting-folders-grid' });
+        function buildCard(folder, members, isMisc) {
+          var expanded = isMisc ? !!window.__miscExpanded : !!folder.expanded;
+          var card = el('div', { 'class': 'mt-folder-card' + (expanded ? ' expanded' : '') + (isMisc ? ' misc' : ''), 'data-id': isMisc ? 'misc' : folder.id });
+          var head = el('div', { 'class': 'mt-folder-card-head' });
+          head.appendChild(el('span', { 'class': 'ic' }, isMisc ? '📂' : '📁'));
+          head.appendChild(el('div', { 'class': 'name' }, isMisc ? '미분류' : folder.name));
+          head.appendChild(el('div', { 'class': 'count' }, members.length + '건'));
+          card.appendChild(head);
+          if (!isMisc) {
             var actions = el('div', { 'class': 'mt-folder-actions' });
             actions.appendChild(el('button', { type: 'button', 'class': 'mt-folder-act', title: '이름 변경', onclick: function (e) { e.stopPropagation(); var nm = prompt('폴더 이름:', folder.name); if (nm !== null && nm.trim()) { folder.name = nm.trim(); save(KEYS.meetingFolders, state.meetingFolders); renderMeetings(); } } }, [iconSvg(['M4 17.5V20h2.5L17 9.5 14.5 7 4 17.5z','M14 7l3 3'])]));
             actions.appendChild(el('button', { type: 'button', 'class': 'mt-folder-act danger', title: '삭제', onclick: function (e) { e.stopPropagation(); if (!confirm('"' + folder.name + '" 폴더를 삭제할까요? 안 회의들은 미분류로 이동됩니다.')) return; state.meetings.forEach(function (m) { if (m.folderId === folder.id) m.folderId = null; }); state.meetingFolders = state.meetingFolders.filter(function (x) { return x.id !== folder.id; }); save(KEYS.meetings, state.meetings); save(KEYS.meetingFolders, state.meetingFolders); renderMeetings(); } }, [iconSvg(['M3 6h18','M8 6V4h8v2','M6 6l1 14h10l1-14'])]));
             card.appendChild(actions);
-            var body = el('div', { 'class': 'mt-folder-body' });
-            if (members.length === 0) body.appendChild(el('div', { 'class': 'mt-folder-empty' }, '이 폴더에 회의록이 없습니다. 회의록을 끌어서 옥기세요.'));
-            else members.slice().sort(sortFn).forEach(function (mt) { renderMeetingRow(mt, body); });
-            card.appendChild(body);
-            card.addEventListener('dragover', function (e) { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; card.classList.add('dragover'); });
-            card.addEventListener('dragleave', function (e) { if (!card.contains(e.relatedTarget)) card.classList.remove('dragover'); });
-            card.addEventListener('drop', function (e) { e.preventDefault(); card.classList.remove('dragover'); var mtId = e.dataTransfer.getData('text/plain'); var mt = state.meetings.find(function (m) { return m.id === mtId; }); if (mt) { mt.folderId = folder.id; save(KEYS.meetings, state.meetings); renderMeetings(); } });
-            grid.appendChild(card);
+          }
+          var body = el('div', { 'class': 'mt-folder-body' });
+          if (members.length === 0) body.appendChild(el('div', { 'class': 'mt-folder-empty' }, '회의록이 없습니다. 이곣 옥기세요.'));
+          else members.slice().sort(sortFn).forEach(function (mt) { renderMeetingRow(mt, body); });
+          card.appendChild(body);
+          card.addEventListener('click', function (e) {
+            if (e.target.closest('.mt-folder-actions') || e.target.closest('.ml-row') || e.target.closest('.ml-item')) return;
+            if (isMisc) { window.__miscExpanded = !window.__miscExpanded; folders.forEach(function (f) { f.expanded = false; }); save(KEYS.meetingFolders, state.meetingFolders); renderMeetings(); }
+            else { folders.forEach(function (f) { if (f.id !== folder.id) f.expanded = false; }); window.__miscExpanded = false; folder.expanded = !folder.expanded; save(KEYS.meetingFolders, state.meetingFolders); renderMeetings(); }
           });
-          listEl.appendChild(grid);
+          card.addEventListener('dragover', function (e) { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; card.classList.add('dragover'); });
+          card.addEventListener('dragleave', function (e) { if (!card.contains(e.relatedTarget)) card.classList.remove('dragover'); });
+          card.addEventListener('drop', function (e) { e.preventDefault(); card.classList.remove('dragover'); var mtId = e.dataTransfer.getData('text/plain'); var mt = state.meetings.find(function (m) { return m.id === mtId; }); if (mt) { mt.folderId = isMisc ? null : folder.id; save(KEYS.meetings, state.meetings); renderMeetings(); } });
+          return card;
         }
-        var unfiled = state.meetings.filter(function (m) { return !m.folderId || !folders.find(function (f) { return f.id === m.folderId; }); });
-        if (folders.length === 0) { unfiled.slice().sort(sortFn).forEach(function (mt) { renderMeetingRow(mt, listEl); }); }
-        else {
-          var miscWrap = el('div', { 'class': 'mt-misc-wrap' });
-          miscWrap.appendChild(el('div', { 'class': 'mt-misc-title' }, '📂 미분류 (' + unfiled.length + '건)'));
-          var miscBody = el('div', { 'class': 'mt-misc-body' });
-          if (unfiled.length === 0) miscBody.appendChild(el('div', { 'class': 'mt-folder-empty' }, '끌어서 이동해보세요.'));
-          else unfiled.slice().sort(sortFn).forEach(function (mt) { renderMeetingRow(mt, miscBody); });
-          miscWrap.appendChild(miscBody);
-          miscWrap.addEventListener('dragover', function (e) { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; miscWrap.classList.add('dragover'); });
-          miscWrap.addEventListener('dragleave', function (e) { if (!miscWrap.contains(e.relatedTarget)) miscWrap.classList.remove('dragover'); });
-          miscWrap.addEventListener('drop', function (e) { e.preventDefault(); miscWrap.classList.remove('dragover'); var mtId = e.dataTransfer.getData('text/plain'); var mt = state.meetings.find(function (m) { return m.id === mtId; }); if (mt) { mt.folderId = null; save(KEYS.meetings, state.meetings); renderMeetings(); } });
-          listEl.appendChild(miscWrap);
-        }
+        folders.forEach(function (folder) { var members = state.meetings.filter(function (m) { return m.folderId === folder.id; }); grid.appendChild(buildCard(folder, members, false)); });
+        if (unfiled.length > 0) grid.appendChild(buildCard({ id: 'misc', expanded: !!window.__miscExpanded }, unfiled, true));
+        listEl.appendChild(grid);
       }
 
       function buildMeetingDetail(page, current) {
@@ -2452,10 +2451,20 @@
         page.appendChild(dateLine);
         // Daily rules (fixed)
         page.appendChild(makeCallout('co-gray', '📌', '데일리 미팅 준수 사항'));
-        var rules = el('div', { 'class': 'm-section' });
+        var rulesSec = el('div', { 'class': 'm-section' });
+        if (!current.rules) current.rules = [];
         var rulesUl = el('ul');
-        ['미팅 아젠다 및 개인 이슈들은 회의 전에 모두 기재 부탁드립니다.', '미팅은 특이사항 없으면 10:30분 고정 진행 됩니다.', '미팅 소요시간은 30-60분 입니다'].forEach(function (t) { rulesUl.appendChild(el('li', null, t)); });
-        rules.appendChild(rulesUl); page.appendChild(rules);
+        current.rules.forEach(function (text, idx) {
+          var li = el('li');
+          var sp = el('span', null, text);
+          makeEditable(sp, false, '항목 입력', function (v) { var nv = v.trim(); if (nv) current.rules[idx] = nv; else { current.rules.splice(idx, 1); renderMeetings(); } });
+          li.appendChild(sp);
+          rulesUl.appendChild(li);
+        });
+        rulesSec.appendChild(rulesUl);
+        var addRulesBtn = el('button', { type: 'button', 'class': 'mt-add', onclick: function () { current.rules.push(''); persist(); renderMeetings(); setTimeout(function () { var inps = document.querySelectorAll('.m-section ul li [data-editable]'); if (inps.length) inps[inps.length-1].focus(); }, 50); } }, '+ 준수 사항 추가');
+        rulesSec.appendChild(addRulesBtn);
+        page.appendChild(rulesSec);
         // Meta block (attendees / location / notes)
         var meta = el('div', { 'class': 'meta-list' });
         var attLine = el('div'); attLine.appendChild(el('b', null, '미팅 참석자'));
@@ -2481,7 +2490,7 @@
         var annP = el('p', { style: { whiteSpace: 'pre-wrap' } }, current.announcements || '');
         makeEditable(annP, true, '공지 사항이 있으면 클릭해서 입력하세요.', function (v) { current.announcements = v; });
         ann.appendChild(annP); page.appendChild(ann);
-        page.appendChild(el('div', { 'class': 'm-section' }, [ el('h2', null, '중요하게 공유하실 사항 있으시면 기재 부탁드립니다') ]));
+        var h2Sec = el('div', { 'class': 'm-section' }); var h2El = el('h2', null, current.h2 || ''); makeEditable(h2El, false, '소제목 입력', function (v) { current.h2 = v; }); h2Sec.appendChild(h2El); page.appendChild(h2Sec);
         function renderList(items, container) {
           container.innerHTML = '';
           items.forEach(function (text, idx) {
