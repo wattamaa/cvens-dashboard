@@ -3412,6 +3412,14 @@
           (mt.specials || []).forEach(function (x) { if (chk(x)) push('회의 특이사항', 'meetingView', t, x); });
           Object.keys(mt.shares || {}).forEach(function (n) { if (chk(mt.shares[n])) push('공유 ' + n, 'meetingView', t, n + ': ' + mt.shares[n]); });
           (mt.attendees || []).forEach(function (a) { if (chk(a)) push('회의 참석', 'meetingView', t, mt.date + ' ' + a); });
+          if (mt.body) {
+            var bodyText = mt.body.replace(/<[^>]+>/g, ' ').replace(/&[^;]+;/g, ' ').replace(/\s+/g, ' ').trim();
+            if (chk(bodyText)) {
+              var idx = bodyText.toLowerCase().indexOf(q);
+              var snippet = bodyText.slice(Math.max(0, idx - 20), idx + q.length + 40).trim();
+              push('회의 본문', 'meetingView', t, (mt.title || '회의록') + ' · …' + snippet + '…');
+            }
+          }
         });
         Object.keys(state.statuses || {}).forEach(function (n) { if (chk(state.statuses[n]) || chk(n)) push('팀원 상태', 'dashboardView', '#teamSection', n + ': ' + state.statuses[n]); });
         return out.slice(0, 15);
