@@ -573,24 +573,41 @@
 
   .timeline-range {
     position: relative;
-    padding: 30px 20px 18px;
+    padding: 0;
     background: rgba(255,255,255,0.025);
     border: 1px solid var(--glass-border);
     border-radius: 18px;
     overflow: hidden;
   }
+  .t-header { display: grid; grid-template-columns: 200px 1fr; height: 32px; border-bottom: 1px solid rgba(255,255,255,0.10); position: relative; z-index: 1; }
+  .t-header-label { padding: 0 14px; display: flex; align-items: center; font-size: 10.5px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; border-right: 1px solid rgba(255,255,255,0.06); font-weight: 600; }
+  .t-rows { position: relative; z-index: 1; }
+  .t-row { display: grid; grid-template-columns: 200px 1fr; min-height: 40px; border-bottom: 1px solid rgba(255,255,255,0.04); transition: 160ms ease; }
+  .t-row:hover { background: rgba(255,255,255,0.025); }
+  .t-row:last-child { border-bottom: 0; }
+  .t-row-label { display: flex; align-items: center; gap: 8px; padding: 4px 12px 4px 14px; border-right: 1px solid rgba(255,255,255,0.06); min-width: 0; }
+  .t-row-name { flex: 1; font-size: 12.5px; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 500; }
+  .t-cat-tag { flex: 0 0 auto; font-size: 9.5px; padding: 2px 7px; border-radius: 999px; color: var(--text); letter-spacing: 0.04em; font-weight: 500; border: 1px solid; white-space: nowrap; }
+  .t-cat-tag.cat-plan   { background: rgba(196,124,212,0.22); border-color: rgba(196,124,212,0.45); }
+  .t-cat-tag.cat-design { background: rgba(216,129,159,0.22); border-color: rgba(216,129,159,0.45); }
+  .t-cat-tag.cat-dev    { background: rgba(122,161,216,0.22); border-color: rgba(122,161,216,0.45); }
+  .t-cat-tag.cat-qa     { background: rgba(221,196,109,0.22); border-color: rgba(221,196,109,0.45); }
+  .t-cat-tag.cat-ops    { background: rgba(127,200,156,0.22); border-color: rgba(127,200,156,0.45); }
+  .t-cat-tag.cat-launch { background: rgba(109,200,200,0.22); border-color: rgba(109,200,200,0.45); }
+  .t-row-track { position: relative; min-width: 0; }
+  .t-row-track .t-bar { top: 50%; transform: translateY(-50%); }
+  .t-row-empty { padding: 30px 16px; font-size: 12.5px; color: var(--text-faint); text-align: center; }
   /* month axis at top */
   .t-months {
-    position: absolute;
-    top: 8px;
-    left: 20px; right: 20px;
-    height: 14px;
+    position: relative;
+    height: 100%;
     pointer-events: none;
     z-index: 0;
   }
   .t-month {
     position: absolute;
-    transform: translateX(-50%);
+    top: 50%;
+    transform: translate(-50%, -50%);
     font-size: 10px;
     color: var(--text-faint);
     letter-spacing: 0.05em;
@@ -600,15 +617,15 @@
     content: '';
     position: absolute;
     left: 50%;
-    top: 16px;
+    top: 12px;
     width: 1px; height: 9999px;
-    background: rgba(255,255,255,0.06);
+    background: rgba(255,255,255,0.04);
     transform: translateX(-50%);
   }
   /* TODAY marker (vertical dashed) */
   .t-today {
     position: absolute;
-    top: 26px; bottom: 12px;
+    top: 32px; bottom: 0;
     width: 0;
     border-left: 2px dashed rgba(255, 220, 100, 0.55);
     z-index: 2;
@@ -617,26 +634,17 @@
   .t-today::after {
     content: 'TODAY';
     position: absolute;
-    top: -16px; left: -22px;
+    top: -22px; left: -22px;
     font-size: 9px;
     letter-spacing: 0.12em;
     color: rgba(255,220,100,0.9);
-    background: rgba(40,40,45,0.7);
+    background: rgba(40,40,45,0.85);
     padding: 1px 6px;
     border-radius: 6px;
     border: 1px solid rgba(255,220,100,0.3);
+    z-index: 3;
   }
   /* Gantt lanes */
-  .t-lanes {
-    position: relative;
-    margin-top: 22px;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    z-index: 1;
-    min-height: 28px;
-  }
-  .t-lane { position: relative; height: 28px; }
   .t-bar {
     position: absolute;
     top: 0;
@@ -1462,9 +1470,12 @@
             </button>
           </header>
           <div class="timeline-range" id="timelineRange">
-            <div class="t-months" id="tMonths"></div>
+            <div class="t-header">
+              <div class="t-header-label">항목</div>
+              <div class="t-months" id="tMonths"></div>
+            </div>
             <div class="t-today" id="tToday"></div>
-            <div class="t-lanes" id="tLanes"></div>
+            <div class="t-rows" id="tRows"></div>
           </div>
         </section>
       </div>
@@ -2547,82 +2558,77 @@
         var todayMs = dateToMs(todayIso);
         var tToday = $('tToday');
         if (todayMs >= dateToMs(state.range.start) && todayMs <= dateToMs(state.range.end)) {
+          var todayPct = pctOf(todayIso, state.range.start, state.range.end);
           tToday.style.display = 'block';
-          tToday.style.left = pctOf(todayIso, state.range.start, state.range.end) + '%';
+          tToday.style.left = 'calc(200px + (100% - 200px) * ' + (todayPct/100) + ')';
         } else {
           tToday.style.display = 'none';
         }
 
-        // events overlapping the range
-        var rs = dateToMs(state.range.start), re = dateToMs(state.range.end);
-        var visible = state.events.filter(function (ev) {
-          var st = dateToMs(ev.start);
-          var en = dateToMs(ev.end || ev.start);
-          return en >= rs && st <= re;
-        });
-        // sort by start, then assign lanes greedily (first lane whose lastEnd < this.start)
-        var sorted = visible.slice().sort(function (a, b) {
+        var sorted = state.events.slice().sort(function (a, b) {
           return dateToMs(a.start) - dateToMs(b.start);
         });
-        var lanes = [];
+
+        var rowsEl = $('tRows');
+        rowsEl.innerHTML = '';
+
+        if (sorted.length === 0) {
+          var empty = el('div', { 'class': 't-row' });
+          empty.appendChild(el('div', { 'class': 't-row-empty', style: { gridColumn: '1 / -1' } }, '아직 일정이 없습니다. 우측 + 버튼으로 추가하세요.'));
+          rowsEl.appendChild(empty);
+        }
+
         sorted.forEach(function (ev) {
-          var st = dateToMs(ev.start);
-          var en = dateToMs(ev.end || ev.start);
-          var idx = -1;
-          for (var i = 0; i < lanes.length; i++) {
-            if (lanes[i].lastEnd < st) { idx = i; break; }
-          }
-          if (idx === -1) { idx = lanes.length; lanes.push({ events: [], lastEnd: 0 }); }
-          lanes[idx].events.push(ev);
-          lanes[idx].lastEnd = en;
-        });
+          var st = dateToMs(ev.start), en = dateToMs(ev.end || ev.start);
+          var leftPct = Math.max(0, pctOf(ev.start, state.range.start, state.range.end));
+          var endPct = Math.min(100, pctOf(ev.end || ev.start, state.range.start, state.range.end));
+          var widthPct = Math.max(1.2, endPct - leftPct);
+          var status = en < todayMs ? 'done' : (st <= todayMs && en >= todayMs ? 'current' : '');
+          var cat = CATEGORIES.find(function (c) { return c.id === ev.category; }) || { name: ev.category };
 
-        var lanesEl = $('tLanes');
-        lanesEl.innerHTML = '';
-        lanes.forEach(function (lane) {
-          var laneDiv = el('div', { 'class': 't-lane' });
-          lane.events.forEach(function (ev) {
-            var leftPct = Math.max(0, pctOf(ev.start, state.range.start, state.range.end));
-            var endPct = Math.min(100, pctOf(ev.end || ev.start, state.range.start, state.range.end));
-            var widthPct = Math.max(1.2, endPct - leftPct);
-            var st = dateToMs(ev.start), en = dateToMs(ev.end || ev.start);
-            var status = en < todayMs ? 'done' : (st <= todayMs && en >= todayMs ? 'current' : '');
-            var bar = el('div', {
-              'class': 't-bar cat-' + ev.category + (status ? ' ' + status : ''),
-              'data-id': ev.id,
-              style: { left: leftPct + '%', width: widthPct + '%' },
-              onclick: function () { if (bar.closest('.editing')) openEventModal(ev); }
-            });
-            var rangeText = fmtMd(ev.start) + (ev.end && ev.end !== ev.start ? ' → ' + fmtMd(ev.end) : '');
-            bar.appendChild(el('span', { 'class': 't-bar-title' }, ev.title));
-            bar.appendChild(el('span', { 'class': 't-bar-dates' }, rangeText));
+          var row = el('div', { 'class': 't-row', 'data-id': ev.id });
+          var lab = el('div', { 'class': 't-row-label' });
+          lab.appendChild(el('span', { 'class': 't-cat-tag cat-' + ev.category }, cat.name));
+          lab.appendChild(el('span', { 'class': 't-row-name' }, ev.title));
+          row.appendChild(lab);
 
-            var actions = el('div', { 'class': 't-actions' });
-            actions.appendChild(el('button', {
-              title: '편집',
-              onclick: function (e2) { e2.stopPropagation(); openEventModal(ev); }
-            }, [iconSvg(['M4 17.5V20h2.5L17 9.5 14.5 7 4 17.5z', 'M14 7l3 3'])]));
-            actions.appendChild(el('button', {
-              'class': 'danger', title: '삭제',
-              onclick: function (e2) {
-                e2.stopPropagation();
-                if (confirm('"' + ev.title + '" 일정을 삭제할까요?')) {
-                  state.events = state.events.filter(function (x) { return x.id !== ev.id; });
-                  save(KEYS.events, state.events);
-                  renderTimeline();
-                }
-              }
-            }, [iconSvg(['M3 6h18', 'M8 6V4h8v2', 'M6 6l1 14h10l1-14'])]));
-            bar.appendChild(actions);
-            laneDiv.appendChild(bar);
+          var track = el('div', { 'class': 't-row-track' });
+          var bar = el('div', {
+            'class': 't-bar cat-' + ev.category + (status ? ' ' + status : ''),
+            'data-id': ev.id,
+            style: { left: leftPct + '%', width: widthPct + '%' },
+            onclick: function () { if (bar.closest('.editing')) openEventModal(ev); }
           });
-          lanesEl.appendChild(laneDiv);
+          var rangeText = fmtMd(ev.start) + (ev.end && ev.end !== ev.start ? ' → ' + fmtMd(ev.end) : '');
+          bar.appendChild(el('span', { 'class': 't-bar-title' }, ev.title));
+          bar.appendChild(el('span', { 'class': 't-bar-dates' }, rangeText));
+
+          var actions = el('div', { 'class': 't-actions' });
+          actions.appendChild(el('button', {
+            title: '편집',
+            onclick: function (e2) { e2.stopPropagation(); openEventModal(ev); }
+          }, [iconSvg(['M4 17.5V20h2.5L17 9.5 14.5 7 4 17.5z', 'M14 7l3 3'])]));
+          actions.appendChild(el('button', {
+            'class': 'danger', title: '삭제',
+            onclick: function (e2) {
+              e2.stopPropagation();
+              if (confirm('"' + ev.title + '" 일정을 삭제할까요?')) {
+                state.events = state.events.filter(function (x) { return x.id !== ev.id; });
+                save(KEYS.events, state.events);
+                renderTimeline();
+              }
+            }
+          }, [iconSvg(['M3 6h18', 'M8 6V4h8v2', 'M6 6l1 14h10l1-14'])]));
+          bar.appendChild(actions);
+          track.appendChild(bar);
+          row.appendChild(track);
+          rowsEl.appendChild(row);
         });
 
-        $('timelineBadge').textContent = state.events.length + ' tasks';
+        $('timelineBadge').textContent = state.events.length + ' 항목';
       }
 
-      function openEventModal(existing) {
+            function openEventModal(existing) {
         var seed = existing
           ? Object.assign({}, existing)
           : { id: uid('e'), title: '', start: state.range.start, end: state.range.start, category: 'plan' };
