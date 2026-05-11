@@ -19,6 +19,14 @@
     --accent-strong: rgba(160, 195, 240, 0.38);
   }
 
+  /* ---- global glassy scrollbar ---- */
+  * { scrollbar-color: rgba(255,255,255,0.14) transparent; scrollbar-width: thin; }
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.10); border-radius: 999px; border: 2px solid transparent; background-clip: padding-box; transition: background 160ms ease; }
+  ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.22); border: 2px solid transparent; background-clip: padding-box; }
+  ::-webkit-scrollbar-corner { background: transparent; }
+
   * { box-sizing: border-box; }
 
   html, body {
@@ -35,9 +43,10 @@
     height: 100vh;
     overflow: hidden;
     background:
-      radial-gradient(ellipse at 20% 0%, rgba(80, 60, 110, 0.38) 0%, transparent 55%),
-      radial-gradient(ellipse at 100% 100%, rgba(40, 80, 120, 0.32) 0%, transparent 55%),
-      linear-gradient(155deg, #181821 0%, #0e0e15 50%, #06060c 100%);
+      radial-gradient(ellipse at 18% -10%, rgba(60, 64, 72, 0.42) 0%, transparent 55%),
+      radial-gradient(ellipse at 110% 100%, rgba(30, 38, 50, 0.40) 0%, transparent 60%),
+      radial-gradient(circle at 50% 50%, rgba(255,255,255,0.012) 0%, transparent 70%),
+      linear-gradient(160deg, #0b0b10 0%, #07070b 50%, #040406 100%);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -425,7 +434,10 @@
     cursor: pointer;
     padding: 0;
   }
-  /* edit affordances only visible in edit mode */
+  /* Quick Links: + button always visible (per UX request) */
+  #qlSection .section-head .add-btn { display: grid; }
+  /* Each quick-link card: small + style stays inside edit mode */
+    /* edit affordances only visible in edit mode */
   .editing .q-link { cursor: pointer; }
   .editing .q-link .del { display: grid; }
   .editing .q-link:hover .icon { box-shadow: inset 0 1px 0 rgba(255,255,255,0.10), 0 0 0 1px rgba(127,200,156,0.45); }
@@ -441,24 +453,44 @@
   .qc-gray   .icon { background: linear-gradient(135deg, rgba(170,170,180,0.30), rgba(100,100,110,0.18)); }
   .qc-pink   .icon { background: linear-gradient(135deg, rgba(232,140,180,0.32), rgba(180,90,130,0.18)); }
 
+  /* ---- dashboard 2-col row (team │ goals) ---- */
+  .dashboard-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 22px; align-items: start; }
+  .dashboard-row .goals,
+  .dashboard-row .team { margin-top: 0; }
+  @media (max-width: 1180px) { .dashboard-row { grid-template-columns: 1fr; } }
+
+  /* ---- team members ---- */
+  .team-cards { display: flex; flex-direction: column; gap: 8px; }
+  .team-card { display: flex; align-items: center; gap: 12px; padding: 10px 14px; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); border-radius: 14px; transition: 160ms ease; position: relative; }
+  .team-card:hover { background: rgba(255,255,255,0.09); }
+  .team-card .avatar-lg { width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; font-weight: 600; font-size: 14px; color: #fff; flex: 0 0 auto; border: 2px solid rgba(35,35,40,0.65); }
+  .team-card .tc-meta { flex: 1; min-width: 0; }
+  .team-card .tc-name { font-size: 13.5px; color: var(--text); font-weight: 500; }
+  .team-card .tc-status { font-size: 12px; color: var(--text-dim); margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .team-card .tc-status.empty { color: var(--text-faint); font-style: italic; }
+  .team-card .tc-edit { width: 24px; height: 24px; border-radius: 7px; background: rgba(255,255,255,0.06); border: 1px solid var(--glass-border); color: var(--text-dim); display: grid; place-items: center; cursor: pointer; padding: 0; flex: 0 0 auto; opacity: 0; transition: opacity 160ms ease; font-family: inherit; }
+  .team-card:hover .tc-edit { opacity: 1; }
+  .team-card .tc-edit:hover { background: var(--accent); border-color: var(--accent-strong); color: var(--text); }
+  .team-card .tc-edit svg { width: 12px; height: 12px; }
+
   /* ---- team goals ---- */
   .goals { margin-top: 22px; }
   .goals-deck {
     position: relative;
-    height: 142px;
+    height: 96px;
     transition: height 480ms cubic-bezier(.4,.2,.2,1);
   }
-  .goals.open .goals-deck { height: 304px; }
+  .goals.open .goals-deck { height: 204px; }
 
   .goal-card {
     position: absolute;
     top: 0; left: 0;
     width: calc(50% - 6px);
-    height: 142px;
+    height: 96px;
     background: rgba(255,255,255,0.07);
     border: 1px solid var(--glass-border);
-    border-radius: 20px;
-    padding: 14px 18px 16px;
+    border-radius: 16px;
+    padding: 10px 14px 12px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -468,9 +500,8 @@
     -webkit-backdrop-filter: blur(20px) saturate(140%);
     box-shadow: 0 8px 22px rgba(0,0,0,0.28);
   }
-  .goal-card { cursor: default; }
+  .goal-card { cursor: pointer; }
   .goal-card:hover { background: rgba(255,255,255,0.12); }
-  .editing .goal-card { cursor: pointer; }
   .editing .goal-card:hover { box-shadow: 0 8px 22px rgba(0,0,0,0.28), 0 0 0 1px rgba(127,200,156,0.45); }
 
   /* dynamic transforms set via inline style during render */
@@ -488,11 +519,14 @@
   }
   .goal-actions {
     position: absolute;
-    top: 8px; right: 8px;
-    display: none;
+    top: 6px; right: 6px;
+    display: flex;
     gap: 4px;
+    opacity: 0.55;
+    transition: opacity 160ms ease;
   }
-  .editing .goal-actions { display: flex; }
+  .goal-card:hover .goal-actions { opacity: 1; }
+  .editing .goal-actions { opacity: 1; }
   .goal-actions button {
     width: 22px; height: 22px;
     border-radius: 7px;
@@ -509,14 +543,14 @@
 
   .goal-progress { display: flex; align-items: baseline; gap: 2px; }
   .goal-progress .pct {
-    font-size: 38px;
-    font-weight: 700;
+    font-size: 26px;
+    font-weight: 600;
     letter-spacing: -0.02em;
     color: var(--text);
     line-height: 1;
   }
   .goal-progress .pct-sym {
-    font-size: 18px;
+    font-size: 13px;
     color: var(--text-dim);
     font-weight: 500;
     margin-left: 2px;
@@ -974,6 +1008,17 @@
   .share-table td { color: var(--text); }
   .share-table td:empty::before { content: '—'; color: var(--text-faint); }
 
+  /* ---- global search results ---- */
+  .search-results { position: absolute; top: 60px; left: 240px; width: min(600px, calc(100% - 320px)); max-height: 360px; overflow-y: auto; background: rgba(35,35,42,0.92); backdrop-filter: blur(40px) saturate(160%); -webkit-backdrop-filter: blur(40px) saturate(160%); border: 1px solid var(--glass-border-strong); border-radius: 14px; padding: 6px; z-index: 45; display: none; box-shadow: 0 24px 60px rgba(0,0,0,0.55); }
+  .search-results.show { display: block; }
+  .sr-row { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 9px; cursor: pointer; font-size: 13px; transition: 160ms ease; }
+  .sr-row:hover { background: rgba(255,255,255,0.08); }
+  .sr-row .sr-type { font-size: 9.5px; padding: 3px 8px; border-radius: 999px; background: rgba(120,160,220,0.22); border: 1px solid rgba(160,195,240,0.35); color: var(--text); letter-spacing: 0.04em; flex: 0 0 auto; text-transform: uppercase; font-weight: 500; white-space: nowrap; }
+  .sr-row .sr-label { flex: 1; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .sr-empty { padding: 14px 12px; font-size: 12.5px; color: var(--text-faint); text-align: center; }
+  @keyframes search-pulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(255,220,100,0); } 30% { box-shadow: 0 0 0 6px rgba(255,220,100,0.55); } }
+  .search-highlight { outline: 2px solid rgba(255,220,100,0.85); outline-offset: 2px; border-radius: 10px; animation: search-pulse 1.5s ease-out 2; }
+
   /* ---- topbar popovers (notifications, settings) ---- */
   .pop {
     position: absolute;
@@ -1142,6 +1187,18 @@
   .bubble .meta .author { color: var(--text-dim); font-weight: 500; }
   .bubble.me .meta .author { color: rgba(220,235,255,0.85); }
 
+  .bubble .reply-btn { font-size: 11px; color: var(--text-faint); background: transparent; border: 0; padding: 0; margin-top: 6px; cursor: pointer; font-family: inherit; display: inline-block; }
+  .bubble .reply-btn:hover { color: var(--text); }
+  .bubble .b-replies { margin-top: 8px; padding-left: 12px; border-left: 2px solid rgba(255,255,255,0.10); display: flex; flex-direction: column; gap: 6px; }
+  .bubble .b-reply { font-size: 12px; line-height: 1.4; padding: 6px 10px 4px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; }
+  .bubble.me .b-reply { background: rgba(120,160,220,0.16); border-color: rgba(160,195,240,0.26); }
+  .bubble .b-reply-meta { display: flex; justify-content: space-between; font-size: 10px; color: var(--text-faint); margin-top: 3px; }
+  .bubble .b-reply-meta .author { color: var(--text-dim); }
+  .bubble .b-reply-input { display: flex; gap: 6px; margin-top: 8px; }
+  .bubble .b-reply-input input { flex: 1; height: 28px; background: rgba(255,255,255,0.06); border: 1px solid var(--glass-border); border-radius: 8px; padding: 0 10px; font-size: 12px; color: var(--text); font-family: inherit; outline: 0; }
+  .bubble .b-reply-input input:focus { border-color: var(--accent-strong); }
+  .bubble .b-reply-input button { width: 28px; height: 28px; border-radius: 8px; background: rgba(120,160,220,0.32); border: 1px solid rgba(160,195,240,0.40); color: var(--text); font-size: 14px; cursor: pointer; padding: 0; line-height: 1; font-family: inherit; }
+  .bubble .b-reply-input button:hover { background: rgba(120,160,220,0.5); }
   .memo-input {
     padding: 12px 14px 14px;
     border-top: 1px solid rgba(255,255,255,0.06);
@@ -1238,7 +1295,18 @@
   .field-group .inline-row { display: flex; gap: 8px; }
   .field-group .inline-row > * { flex: 1; }
 
-  .toggle-list { display: flex; gap: 6px; flex-wrap: wrap; }
+  /* checklist (goal expand modal) */
+  .checklist { display: flex; flex-direction: column; gap: 4px; max-height: 280px; overflow-y: auto; padding: 4px 2px 8px; margin-top: 6px; }
+  .checklist-row { display: flex; align-items: center; gap: 10px; padding: 6px 8px; border-radius: 8px; transition: 160ms ease; }
+  .checklist-row:hover { background: rgba(255,255,255,0.04); }
+  .check-box { width: 18px; height: 18px; border-radius: 5px; background: rgba(255,255,255,0.06); border: 1px solid var(--glass-border); color: var(--text); display: grid; place-items: center; cursor: pointer; padding: 0; font-size: 11px; flex: 0 0 auto; font-family: inherit; }
+  .check-box.on { background: rgba(127,200,156,0.42); border-color: rgba(127,200,156,0.65); }
+  .check-text { flex: 1; font-size: 13.5px; color: var(--text); }
+  .check-text.done { text-decoration: line-through; color: var(--text-faint); }
+  .check-del { width: 22px; height: 22px; border-radius: 6px; background: transparent; border: 0; color: var(--text-faint); cursor: pointer; font-size: 14px; line-height: 1; padding: 0; flex: 0 0 auto; opacity: 0.4; transition: opacity 160ms ease; }
+  .checklist-row:hover .check-del { opacity: 1; }
+  .check-del:hover { color: #fff; background: rgba(220,90,90,0.35); }
+    .toggle-list { display: flex; gap: 6px; flex-wrap: wrap; }
   .toggle {
     padding: 6px 12px;
     border-radius: 999px;
@@ -1395,6 +1463,7 @@
           <button id="changeUserBtn">사용자 변경</button>
           <button id="resetAllBtn" class="danger">모든 데이터 초기화</button>
         </div>
+        <div class="search-results" id="searchResults"></div>
       </header>
 
       <!-- sidebar -->
@@ -1435,8 +1504,18 @@
           <div class="quick-links" id="quickLinks"></div>
         </section>
 
-        <!-- Team Goals -->
-        <section class="goals" id="goals">
+        <div class="dashboard-row">
+          <!-- Team Members -->
+          <section class="team" id="teamSection">
+            <header class="section-head">
+              <h3>팀원 구성</h3>
+              <span class="badge" id="teamBadge">3</span>
+            </header>
+            <div class="team-cards" id="teamCards"></div>
+          </section>
+
+          <!-- Team Goals -->
+          <section class="goals open" id="goals">
           <header class="section-head">
             <h3 id="goalsToggle" style="cursor:pointer">팀 목표</h3>
             <span class="badge" id="goalsBadge">4</span>
@@ -1451,6 +1530,7 @@
           </header>
           <div class="goals-deck" id="goalsDeck"></div>
         </section>
+        </div>
 
         <!-- Timeline (date-range) -->
         <section class="timeline" id="timelineSection">
@@ -1463,6 +1543,12 @@
               <span class="range-sep">~</span>
               <input type="date" id="rangeEnd" />
             </div>
+            <button class="icon-btn-sm" id="zoomOutBtn" title="축소 (range 2배)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14"/></svg>
+            </button>
+            <button class="icon-btn-sm" id="zoomInBtn" title="확대 (range 1/2)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+            </button>
             <button class="edit-toggle" id="editTimeline" title="편집">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17.5V20h2.5L17 9.5 14.5 7 4 17.5z"/><path d="M14 7l3 3"/></svg>
             </button>
@@ -1625,14 +1711,7 @@
 
       // ---------- DEFAULTS ----------
       var DEFAULT_QUICKLINKS = [
-        { id: 'ql1', label: '캘린더', icon: 'calendar', color: 'red' },
-        { id: 'ql2', label: '메일',   icon: 'mail',     color: 'blue' },
-        { id: 'ql3', label: '노트',   icon: 'notes',    color: 'amber' },
-        { id: 'ql4', label: '음악',   icon: 'music',    color: 'purple' },
-        { id: 'ql5', label: '사진',   icon: 'photos',   color: 'teal' },
-        { id: 'ql6', label: '파일',   icon: 'files',    color: 'orange' },
-        { id: 'ql7', label: '채팅',   icon: 'chat',     color: 'green' },
-        { id: 'ql8', label: '설정',   icon: 'settings', color: 'gray' }
+        { id: 'ql1', label: '예시 링크', icon: 'link', color: 'blue' }
       ];
       var DEFAULT_GOALS = [
         { id: 'g1', name: 'Q2 신규 사용자 1만명 달성',     progress: 67, members: ['고동기','이유민'] },
@@ -1708,6 +1787,11 @@
         { id: 'm2', author: '전민욱', text: '타임라인 시작/종료일 입력으로 변경하면 더 직관적일 듯.', time: '10:02' },
         { id: 'm3', author: '이유민', text: '아이콘 컬러 톤은 디자인 시스템 v2에서 통일.', time: '12:30' }
       ];
+      var DEFAULT_STATUSES = {
+        '고동기': '오늘은 백엔드 알파 빌드 마무리',
+        '이유민': 'QA 리포트 정리',
+        '전민욱': '디자인 시스템 v2 시안 공유'
+      };
 
       // ---------- STORAGE ----------
       var KEYS = {
@@ -1721,7 +1805,8 @@
         meetings: 'cv_meetings',
         view: 'cv_active_view',
         currentMeeting: 'cv_current_meeting',
-        meetingSort: 'cv_meeting_sort'
+        meetingSort: 'cv_meeting_sort',
+        statuses: 'cv_statuses'
       };
       var FIREBASE_PATHS = {};
       // Now populate FIREBASE_PATHS — only SHARED data goes to cloud.
@@ -1734,6 +1819,7 @@
       FIREBASE_PATHS[KEYS.memos]    = 'memos';
       FIREBASE_PATHS[KEYS.sidebar]  = 'sidebar';
       FIREBASE_PATHS[KEYS.meetings] = 'meetings';
+      FIREBASE_PATHS[KEYS.statuses] = 'statuses';
       function load(key, fallback) {
         try {
           var raw = localStorage.getItem(key);
@@ -1766,10 +1852,17 @@
         meetings: load(KEYS.meetings, DEFAULT_MEETINGS),
         activeView: load(KEYS.view, 'dashboardView'),
         currentMeetingId: load(KEYS.currentMeeting, null),
-        meetingSortDesc: load(KEYS.meetingSort, true)
+        meetingSortDesc: load(KEYS.meetingSort, true),
+        statuses: load(KEYS.statuses, DEFAULT_STATUSES)
       };
       // migrate old single-date events → start/end pair
-      state.events = state.events.map(function (e) {
+      // migrate goals: ensure checklist field exists
+      state.goals = state.goals.map(function (g) { if (!g.checklist) g.checklist = []; return g; });
+      save(KEYS.goals, state.goals);
+      // migrate memos: ensure replies array exists
+      state.memos = state.memos.map(function (m) { if (!m.replies) m.replies = []; return m; });
+      save(KEYS.memos, state.memos);
+            state.events = state.events.map(function (e) {
         if (e.date && !e.start) {
           return { id: e.id, title: e.title, category: e.category, start: e.date, end: e.date };
         }
@@ -2352,14 +2445,61 @@
       }
 
       // ============================================================
+      // TEAM (members + status messages)
+      // ============================================================
+      function renderTeam() {
+        var root = $('teamCards');
+        if (!root) return;
+        root.innerHTML = '';
+        var team = (typeof TEAM !== 'undefined' ? TEAM : ['고동기','이유민','전민욱']);
+        team.forEach(function (name) {
+          var status = (state.statuses && state.statuses[name]) || '';
+          var card = el('div', { 'class': 'team-card' });
+          card.appendChild(el('div', { 'class': 'avatar-lg ' + (AVATAR_CLS[name] || '') }, INITIAL[name] || (name[0] || '?')));
+          var meta = el('div', { 'class': 'tc-meta' });
+          meta.appendChild(el('div', { 'class': 'tc-name' }, name));
+          meta.appendChild(el('div', { 'class': 'tc-status' + (status ? '' : ' empty') }, status || '상태 메시지 없음'));
+          card.appendChild(meta);
+          if (name === state.user) {
+            var editBtn = el('button', { type: 'button', 'class': 'tc-edit', title: '내 상태 메시지 편집', onclick: function (e) { e.stopPropagation(); openStatusModal(name); } });
+            editBtn.appendChild(iconSvg(['M4 17.5V20h2.5L17 9.5 14.5 7 4 17.5z', 'M14 7l3 3']));
+            card.appendChild(editBtn);
+          }
+          root.appendChild(card);
+        });
+        if ($('teamBadge')) $('teamBadge').textContent = team.length;
+      }
+
+      function openStatusModal(name) {
+        var current = (state.statuses && state.statuses[name]) || '';
+        var inp = document.createElement('input');
+        inp.type = 'text'; inp.value = current; inp.placeholder = '오늘의 한줄 (예: 디자인 시스템 v2 작업)';
+        inp.style.cssText = 'width:100%;height:38px;background:rgba(255,255,255,0.06);border:1px solid var(--glass-border);border-radius:10px;color:var(--text);padding:0 12px;font-size:13px;font-family:inherit;outline:0;';
+        var body = el('div');
+        body.appendChild(el('div', { 'class': 'field-group' }, [el('label', null, name + '의 한줄 상태'), inp]));
+        showModal({
+          title: '상태 메시지 편집',
+          sub: '대시보드 "팀원 구성" 카드에 표시됩니다.',
+          body: body,
+          onSave: function () {
+            if (!state.statuses) state.statuses = {};
+            state.statuses[name] = (inp.value || '').trim();
+            save(KEYS.statuses, state.statuses);
+            renderTeam();
+            hideModal();
+          }
+        });
+      }
+
+      // ============================================================
       // GOALS
       // ============================================================
       function renderGoals() {
         var deck = $('goalsDeck');
         deck.innerHTML = '';
-        var deckH = 142;
+        var deckH = 96;
         deck.style.height = ($('goals').classList.contains('open')
-          ? (Math.ceil(state.goals.length / 2) * (deckH + 20))
+          ? (Math.ceil(state.goals.length / 2) * (deckH + 12))
           : deckH) + 'px';
 
         state.goals.forEach(function (g, i) {
@@ -2417,7 +2557,7 @@
           card.appendChild(people);
 
           card.addEventListener('click', function () {
-            if (card.closest('.editing')) openGoalModal(g);
+            openGoalChecklistModal(g);
           });
           deck.appendChild(card);
         });
@@ -2476,6 +2616,52 @@
         });
       }
 
+      function openGoalChecklistModal(g) {
+        if (!g.checklist) g.checklist = [];
+        var body = document.createElement('div');
+        var listWrap = document.createElement('div');
+        listWrap.className = 'checklist';
+        function recalcProgress() {
+          if (!g.checklist || !g.checklist.length) return;
+          var done = g.checklist.filter(function(x){return x.done;}).length;
+          g.progress = Math.round(done / g.checklist.length * 100);
+          save(KEYS.goals, state.goals); renderGoals();
+        }
+        function rerender() {
+          listWrap.innerHTML = '';
+          if (!g.checklist.length) {
+            listWrap.appendChild(el('div', { style: { padding: '8px 4px', color: 'var(--text-faint)', fontSize: '13px' } }, '아직 체크리스트 항목이 없습니다. 아래 입력란에 추가해보세요.'));
+          }
+          g.checklist.forEach(function (item, idx) {
+            var row = el('div', { 'class': 'checklist-row' });
+            var cb = el('button', { type: 'button', 'class': 'check-box' + (item.done ? ' on' : ''), onclick: function () { item.done = !item.done; cb.classList.toggle('on', item.done); cb.textContent = item.done ? '✓' : ''; row.querySelector('.check-text').classList.toggle('done', item.done); save(KEYS.goals, state.goals); recalcProgress(); } }, item.done ? '✓' : '');
+            row.appendChild(cb);
+            row.appendChild(el('span', { 'class': 'check-text' + (item.done ? ' done' : '') }, item.text));
+            var del = el('button', { type: 'button', 'class': 'check-del', title: '삭제', onclick: function () { g.checklist.splice(idx, 1); save(KEYS.goals, state.goals); rerender(); recalcProgress(); } }, '×');
+            row.appendChild(del);
+            listWrap.appendChild(row);
+          });
+        }
+        rerender();
+        body.appendChild(el('div', { style: { fontSize: '14px', fontWeight: 500, color: 'var(--text-dim)', marginBottom: '2px' } }, g.name));
+        body.appendChild(listWrap);
+        var inp = document.createElement('input');
+        inp.type = 'text'; inp.placeholder = '새 항목 입력 후 Enter';
+        inp.style.cssText = 'width:100%;height:36px;background:rgba(255,255,255,0.06);border:1px solid var(--glass-border);border-radius:10px;color:var(--text);padding:0 12px;font-size:13px;font-family:inherit;outline:0;margin-top:10px;';
+        inp.addEventListener('keydown', function (e) {
+          if (e.key === 'Enter') {
+            e.preventDefault(); e.stopPropagation();
+            var v = (inp.value || '').trim();
+            if (!v) return;
+            g.checklist.push({ id: uid('chk'), text: v, done: false });
+            inp.value = '';
+            save(KEYS.goals, state.goals); rerender(); recalcProgress();
+          }
+        });
+        body.appendChild(inp);
+        showModal({ title: '체크리스트', sub: (g.checklist.length ? Math.round((g.checklist.filter(function(x){return x.done;}).length / g.checklist.length) * 100) : 0) + '% 완료 · 참여자 ' + ((g.members || []).join(', ') || '없음'), body: body, onSave: hideModal });
+      }
+
       // ============================================================
       // TIMELINE
       // ============================================================
@@ -2493,18 +2679,42 @@
 
         var months = $('tMonths');
         months.innerHTML = '';
-        var s = new Date(state.range.start + 'T00:00:00');
-        var eDate = new Date(state.range.end + 'T00:00:00');
-        var cursor = new Date(s.getFullYear(), s.getMonth(), 1);
-        while (cursor.getTime() <= eDate.getTime()) {
-          var iso = cursor.getFullYear() + '-' + String(cursor.getMonth()+1).padStart(2,'0') + '-01';
-          var p = pctOf(iso, state.range.start, state.range.end);
-          if (p >= 0 && p <= 100) {
-            var label = (cursor.getMonth() === 0 ? cursor.getFullYear() + ' ' : '') +
-                        ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][cursor.getMonth()];
-            months.appendChild(el('div', { 'class': 't-month', style: { left: p + '%' } }, label));
+        var ts = new Date(state.range.start + 'T00:00:00');
+        var te = new Date(state.range.end + 'T00:00:00');
+        var durationDays = (te.getTime() - ts.getTime()) / 86400000;
+        if (durationDays <= 18) {
+          var cur = new Date(ts);
+          while (cur.getTime() <= te.getTime()) {
+            var iso = cur.getFullYear() + '-' + String(cur.getMonth()+1).padStart(2,'0') + '-' + String(cur.getDate()).padStart(2,'0');
+            var p = pctOf(iso, state.range.start, state.range.end);
+            if (p >= 0 && p <= 100) {
+              months.appendChild(el('div', { 'class': 't-month', style: { left: p + '%' } }, (cur.getMonth()+1) + '/' + cur.getDate()));
+            }
+            cur.setDate(cur.getDate() + 1);
           }
-          cursor.setMonth(cursor.getMonth() + 1);
+        } else if (durationDays <= 75) {
+          var cur2 = new Date(ts);
+          var day = cur2.getDay(); var diff = (day === 0 ? -6 : 1 - day);
+          cur2.setDate(cur2.getDate() + diff);
+          while (cur2.getTime() <= te.getTime()) {
+            var iso2 = cur2.getFullYear() + '-' + String(cur2.getMonth()+1).padStart(2,'0') + '-' + String(cur2.getDate()).padStart(2,'0');
+            var p2 = pctOf(iso2, state.range.start, state.range.end);
+            if (p2 >= 0 && p2 <= 100) {
+              months.appendChild(el('div', { 'class': 't-month', style: { left: p2 + '%' } }, (cur2.getMonth()+1) + '/' + cur2.getDate()));
+            }
+            cur2.setDate(cur2.getDate() + 7);
+          }
+        } else {
+          var cursor = new Date(ts.getFullYear(), ts.getMonth(), 1);
+          while (cursor.getTime() <= te.getTime()) {
+            var iso3 = cursor.getFullYear() + '-' + String(cursor.getMonth()+1).padStart(2,'0') + '-01';
+            var p3 = pctOf(iso3, state.range.start, state.range.end);
+            if (p3 >= 0 && p3 <= 100) {
+              var label = (cursor.getMonth() === 0 ? cursor.getFullYear() + ' ' : '') + ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][cursor.getMonth()];
+              months.appendChild(el('div', { 'class': 't-month', style: { left: p3 + '%' } }, label));
+            }
+            cursor.setMonth(cursor.getMonth() + 1);
+          }
         }
 
         var today = new Date();
@@ -2648,44 +2858,60 @@
         thread.innerHTML = '';
         thread.appendChild(el('div', { 'class': 'day-divider' }, 'Today'));
         state.memos.forEach(function (m) {
-          var b = el('div', {
-            'class': 'bubble' + (m.author === state.user ? ' me' : ''),
-            'data-id': m.id,
-            'data-author': m.author
-          });
+          var b = el('div', { 'class': 'bubble' + (m.author === state.user ? ' me' : ''), 'data-id': m.id, 'data-author': m.author });
           b.appendChild(document.createTextNode(m.text));
-          var meta = el('div', { 'class': 'meta' }, [
-            el('span', { 'class': 'author' }, m.author),
-            el('span', { 'class': 'time' }, m.time)
-          ]);
+          var meta = el('div', { 'class': 'meta' }, [ el('span', { 'class': 'author' }, m.author), el('span', { 'class': 'time' }, m.time) ]);
           b.appendChild(meta);
-          // own-memo edit/delete actions
           if (m.author === state.user) {
             var bact = el('div', { 'class': 'b-actions' });
-            bact.appendChild(el('button', {
-              title: '편집',
-              onclick: function (e) { e.stopPropagation(); openMemoModal(m); }
-            }, [iconSvg(['M4 17.5V20h2.5L17 9.5 14.5 7 4 17.5z', 'M14 7l3 3'])]));
-            bact.appendChild(el('button', {
-              'class': 'danger', title: '삭제',
-              onclick: function (e) {
-                e.stopPropagation();
-                if (confirm('이 메모를 삭제할까요?')) {
-                  state.memos = state.memos.filter(function (x) { return x.id !== m.id; });
-                  save(KEYS.memos, state.memos);
-                  renderMemos();
-                }
-              }
-            }, [iconSvg(['M3 6h18', 'M8 6V4h8v2', 'M6 6l1 14h10l1-14'])]));
+            bact.appendChild(el('button', { title: '편집', onclick: function (e) { e.stopPropagation(); openMemoModal(m); } }, [iconSvg(['M4 17.5V20h2.5L17 9.5 14.5 7 4 17.5z', 'M14 7l3 3'])]));
+            bact.appendChild(el('button', { 'class': 'danger', title: '삭제', onclick: function (e) { e.stopPropagation(); if (confirm('이 메모를 삭제할까요?')) { state.memos = state.memos.filter(function (x) { return x.id !== m.id; }); save(KEYS.memos, state.memos); renderMemos(); } } }, [iconSvg(['M3 6h18', 'M8 6V4h8v2', 'M6 6l1 14h10l1-14'])]));
             b.appendChild(bact);
           }
+          if (m.replies && m.replies.length) {
+            var rep = el('div', { 'class': 'b-replies' });
+            m.replies.forEach(function (r) {
+              var rb = el('div', { 'class': 'b-reply' });
+              rb.appendChild(document.createTextNode(r.text));
+              rb.appendChild(el('div', { 'class': 'b-reply-meta' }, [ el('span', { 'class': 'author' }, r.author), el('span', null, r.time) ]));
+              rep.appendChild(rb);
+            });
+            b.appendChild(rep);
+          }
+          var replyBtn = el('button', { type: 'button', 'class': 'reply-btn', onclick: function (e) {
+            e.stopPropagation();
+            var existing = b.querySelector('.b-reply-input');
+            if (existing) { existing.remove(); return; }
+            if (!state.user) { showPicker(); return; }
+            var form = el('div', { 'class': 'b-reply-input' });
+            var inp = document.createElement('input');
+            inp.type = 'text'; inp.placeholder = '답글 입력 후 Enter';
+            form.appendChild(inp);
+            var send = el('button', { type: 'button' }, '↑');
+            function submit() {
+              var v = (inp.value || '').trim();
+              if (!v) return;
+              if (!m.replies) m.replies = [];
+              var now = new Date();
+              var hh = String(now.getHours()).padStart(2, '0'), mm = String(now.getMinutes()).padStart(2, '0');
+              m.replies.push({ id: uid('r'), author: state.user, text: v, time: hh + ':' + mm });
+              save(KEYS.memos, state.memos);
+              renderMemos();
+            }
+            send.addEventListener('click', function (e2) { e2.stopPropagation(); submit(); });
+            inp.addEventListener('keydown', function (e2) { if (e2.key === 'Enter') { e2.preventDefault(); e2.stopPropagation(); submit(); } });
+            form.appendChild(send);
+            b.appendChild(form);
+            inp.focus();
+          } }, '↳ 답글');
+          b.appendChild(replyBtn);
           thread.appendChild(b);
         });
         $('memoCount').textContent = state.memos.length;
         thread.scrollTop = thread.scrollHeight;
       }
 
-      function openMemoModal(m) {
+            function openMemoModal(m) {
         var textI = document.createElement('textarea');
         textI.value = m.text;
         textI.rows = 4;
@@ -2882,6 +3108,21 @@
         renderTimeline();
       });
 
+      // Timeline zoom controls
+      function zoomTimeline(factor) {
+        var sMs = dateToMs(state.range.start), eMs = dateToMs(state.range.end);
+        var mid = (sMs + eMs) / 2;
+        var half = ((eMs - sMs) / 2) * factor;
+        if (half < 1.5 * 86400000) half = 1.5 * 86400000;
+        var ns = new Date(mid - half), ne = new Date(mid + half);
+        state.range.start = ns.getFullYear() + '-' + String(ns.getMonth()+1).padStart(2,'0') + '-' + String(ns.getDate()).padStart(2,'0');
+        state.range.end   = ne.getFullYear() + '-' + String(ne.getMonth()+1).padStart(2,'0') + '-' + String(ne.getDate()).padStart(2,'0');
+        save(KEYS.range, state.range);
+        renderTimeline();
+      }
+      $('zoomInBtn').addEventListener('click', function () { zoomTimeline(0.5); });
+      $('zoomOutBtn').addEventListener('click', function () { zoomTimeline(2); });
+
       // ============================================================
       // MEMO submit
       // ============================================================
@@ -2902,41 +3143,101 @@
       // ============================================================
       // GLOBAL SEARCH (highlight matching items)
       // ============================================================
+      function buildSearchResults(q) {
+        if (!q) return [];
+        var out = [];
+        function chk(t) { return t && t.toLowerCase().indexOf(q) !== -1; }
+        function push(type, view, target, label) { out.push({ type: type, view: view, target: target, label: label }); }
+        (state.ql || []).forEach(function (x) { if (chk(x.label)) push('Quick Link', 'dashboardView', '.q-link[data-id="' + x.id + '"]', x.label); });
+        (state.goals || []).forEach(function (g) {
+          if (chk(g.name)) push('팀 목표', 'dashboardView', '#goals', g.name);
+          (g.checklist || []).forEach(function (c) { if (chk(c.text)) push('체크리스트', 'dashboardView', '#goals', g.name + ' › ' + c.text); });
+        });
+        (state.events || []).forEach(function (e) { if (chk(e.title)) push('타임라인', 'dashboardView', '.t-bar[data-id="' + e.id + '"]', e.title); });
+        (state.memos || []).forEach(function (m) {
+          if (chk(m.text)) push('메모', 'dashboardView', '.bubble[data-id="' + m.id + '"]', m.author + ': ' + m.text);
+          (m.replies || []).forEach(function (r) { if (chk(r.text)) push('답글', 'dashboardView', '.bubble[data-id="' + m.id + '"]', r.author + ' › ' + r.text); });
+        });
+        (state.sidebar || []).forEach(function (f) {
+          (f.children || []).forEach(function (i) { if (chk(i.label)) push('사이드바', i.view || 'dashboardView', '.sb-item[data-id="' + i.id + '"]', i.label); });
+        });
+        (state.meetings || []).forEach(function (mt) {
+          var t='.ml-item[data-id="'+mt.id+'"]';
+          if (chk(mt.title) || chk(mt.date)) push('회의록', 'meetingView', t, mt.date + ' ' + mt.title);
+          if (chk(mt.location)) push('회의 장소', 'meetingView', t, mt.title + ' · ' + mt.location);
+          if (chk(mt.notes)) push('회의 특이', 'meetingView', t, mt.title + ' · ' + mt.notes);
+          if (chk(mt.announcements)) push('회의 공지', 'meetingView', t, mt.title);
+          (mt.issues || []).forEach(function (x) { if (chk(x)) push('회의 이슈', 'meetingView', t, x); });
+          (mt.decisions || []).forEach(function (x) { if (chk(x)) push('회의 결정', 'meetingView', t, x); });
+          (mt.specials || []).forEach(function (x) { if (chk(x)) push('회의 특이사항', 'meetingView', t, x); });
+          Object.keys(mt.shares || {}).forEach(function (n) { if (chk(mt.shares[n])) push('공유 ' + n, 'meetingView', t, n + ': ' + mt.shares[n]); });
+          (mt.attendees || []).forEach(function (a) { if (chk(a)) push('회의 참석', 'meetingView', t, mt.date + ' ' + a); });
+        });
+        Object.keys(state.statuses || {}).forEach(function (n) { if (chk(state.statuses[n]) || chk(n)) push('팀원 상태', 'dashboardView', '#teamSection', n + ': ' + state.statuses[n]); });
+        return out.slice(0, 15);
+      }
+
+      function renderSearchResults(q, results) {
+        var dd = $('searchResults'); if (!dd) return;
+        dd.innerHTML = '';
+        if (!q) { dd.classList.remove('show'); return; }
+        if (!results.length) {
+          dd.appendChild(el('div', { 'class': 'sr-empty' }, '"' + q + '"에 대한 결과 없음'));
+          dd.classList.add('show'); return;
+        }
+        results.forEach(function (r) {
+          var row = el('div', { 'class': 'sr-row', onclick: function () {
+            $('globalSearch').value = '';
+            dd.classList.remove('show');
+            // restore opacity
+            ['.q-link','.goal-card','.t-bar','.bubble','.sb-item','.ml-item'].forEach(function (sel) { Array.from(document.querySelectorAll(sel)).forEach(function (n) { n.style.opacity = ''; }); });
+            gotoSearchTarget(r);
+          } });
+          row.appendChild(el('span', { 'class': 'sr-type' }, r.type));
+          row.appendChild(el('span', { 'class': 'sr-label' }, r.label));
+          dd.appendChild(row);
+        });
+        dd.classList.add('show');
+      }
+
+      function gotoSearchTarget(r) {
+        if (r.view) setView(r.view);
+        var mm = r.target && r.target.match(/\.ml-item\[data-id="([^"]+)"\]/);
+        if (mm) { state.currentMeetingId = mm[1]; save(KEYS.currentMeeting, mm[1]); renderMeetings(); }
+        if (r.target && r.target.indexOf('#goals') === 0) {
+          var gel = $('goals');
+          if (gel && !gel.classList.contains('open')) {
+            gel.classList.add('open');
+            if ($('goalsChev')) $('goalsChev').style.transform = 'rotate(180deg)';
+            renderGoals();
+          }
+        }
+        setTimeout(function () {
+          var node = document.querySelector(r.target);
+          if (!node) return;
+          node.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          node.classList.add('search-highlight');
+          setTimeout(function () { node.classList.remove('search-highlight'); }, 3000);
+        }, 250);
+      }
+
       $('globalSearch').addEventListener('input', function () {
         var q = ($('globalSearch').value || '').trim().toLowerCase();
-        var match = function (s) { return q === '' || (s || '').toLowerCase().indexOf(q) !== -1; };
-        // quick links
-        Array.from(document.querySelectorAll('.q-link')).forEach(function (n) {
-          var label = n.querySelector('.label').textContent;
-          n.style.opacity = match(label) ? '' : '0.3';
-        });
-        // goals
-        Array.from(document.querySelectorAll('.goal-card')).forEach(function (n) {
-          var name = (n.querySelector('.goal-name') || {}).textContent || '';
-          n.style.opacity = match(name) ? '' : '0.25';
-        });
-        // timeline bars
-        Array.from(document.querySelectorAll('.t-bar')).forEach(function (n) {
-          var title = (n.querySelector('.t-bar-title') || {}).textContent || '';
-          n.style.opacity = match(title) ? '' : '0.25';
-        });
-        // memos
-        Array.from(document.querySelectorAll('.bubble')).forEach(function (n) {
-          var t = n.firstChild ? (n.firstChild.textContent || '') : '';
-          n.style.opacity = match(t) ? '' : '0.3';
-        });
-        // sidebar items
-        Array.from(document.querySelectorAll('.sb-item')).forEach(function (n) {
-          var label = (n.querySelector('.label') || {}).textContent || '';
-          n.style.opacity = match(label) ? '' : '0.3';
-        });
-        // meeting list
-        Array.from(document.querySelectorAll('.ml-item')).forEach(function (n) {
-          var t = (n.querySelector('.ml-title') || {}).textContent || '';
-          n.style.opacity = match(t) ? '' : '0.25';
-        });
+        var match = function (str) { return q === '' || (str || '').toLowerCase().indexOf(q) !== -1; };
+        Array.from(document.querySelectorAll('.q-link')).forEach(function (n) { var label = (n.querySelector('.label') || {}).textContent || ''; n.style.opacity = match(label) ? '' : '0.3'; });
+        Array.from(document.querySelectorAll('.goal-card')).forEach(function (n) { var name = (n.querySelector('.goal-name') || {}).textContent || ''; n.style.opacity = match(name) ? '' : '0.25'; });
+        Array.from(document.querySelectorAll('.t-bar')).forEach(function (n) { var title = (n.querySelector('.t-bar-title') || {}).textContent || ''; n.style.opacity = match(title) ? '' : '0.25'; });
+        Array.from(document.querySelectorAll('.bubble')).forEach(function (n) { var t = n.firstChild ? (n.firstChild.textContent || '') : ''; n.style.opacity = match(t) ? '' : '0.3'; });
+        Array.from(document.querySelectorAll('.sb-item')).forEach(function (n) { var label = (n.querySelector('.label') || {}).textContent || ''; n.style.opacity = match(label) ? '' : '0.3'; });
+        Array.from(document.querySelectorAll('.ml-item')).forEach(function (n) { var t = (n.querySelector('.ml-title') || {}).textContent || ''; n.style.opacity = match(t) ? '' : '0.25'; });
+        renderSearchResults(q, buildSearchResults(q));
       });
-      // Cmd/Ctrl+K to focus search
+      document.addEventListener('click', function (e) {
+        if (!e.target.closest('.global-search') && !e.target.closest('.search-results')) {
+          var dd = $('searchResults'); if (dd) dd.classList.remove('show');
+        }
+      });
+            // Cmd/Ctrl+K to focus search
       document.addEventListener('keydown', function (e) {
         if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
           e.preventDefault();
@@ -2950,6 +3251,7 @@
       // ============================================================
       renderSidebar();
       renderQuickLinks();
+      renderTeam();
       renderGoals();
       renderTimeline();
       renderMemos();
@@ -2967,6 +3269,7 @@
       STATE_PROP[KEYS.memos]    = 'memos';
       STATE_PROP[KEYS.sidebar]  = 'sidebar';
       STATE_PROP[KEYS.meetings] = 'meetings';
+      STATE_PROP[KEYS.statuses] = 'statuses';
 
       var RENDER_FN = {};
       RENDER_FN[KEYS.ql]       = renderQuickLinks;
@@ -2976,6 +3279,7 @@
       RENDER_FN[KEYS.memos]    = renderMemos;
       RENDER_FN[KEYS.sidebar]  = renderSidebar;
       RENDER_FN[KEYS.meetings] = renderMeetings;
+      RENDER_FN[KEYS.statuses] = renderTeam;
 
       function attachFirebaseListeners() {
         if (!window.__cvDb) return;
