@@ -585,6 +585,12 @@ state.events = state.events.map(e => {
 - **미분류 드롭 영역**: .mt-misc-wrap (dashed border → dragover 시 solid+아이콘 틴트). 폴더 있을 때만 등장
 - **회의 제목 인라인 편집**: .ml-title contentEditable=true + blur/Enter/Esc. 클릭/mousedown stopPropagation 하여 접기/펼침 트리거 방지. 수정 값이 원본과 다르면 mt.title 갱신 + save + renderMeetings
 
+### 26단계: 회의록 자유편집 본문 + 폴더카드 리파인 + 검수 fix (commits 948dd59 / 9b08578 / 4403f05)
+> "회의록 빈 대지에서 클릭/줄바꿈/자유 편집 / 영역이 아니라 모든 곳 수정 / 보완할 부분 전체 검수"
+- **P11**: 미분류 wrap 제거 → 미분류도 폴더 grid 안 카드(📂)과 동일한 치. 폴더 카드 전체 영역 click → 펼침/접기 (ml-item / .ml-actions / .mt-folder-actions 클릭 제외). rules/h2 인라인 편집 추가.
+- **P12**: 회의록 세션별 구조 제거 → .mt-body 단일 contentEditable. 기존 mt(rules/announcements/issues/shares/decisions/specials/h2/location/notes) 데이터는 마이그레이션으로 HTML callout/ul/p로 합쳐 mt.body에 옮김. 빈 회의는 완전 빈 캠버스 + placeholder. 자동 저장 (input → 600ms debounce, blur 즉시).
+- **P13 검수 fix**: 전역 검색 buildSearchResults가 mt.announcements/issues/decisions 등만 색인하고 있었음 → mt.body의 HTML 텍스트 추출 후 검색 추가 (`<tag>` / `&entity;` 변가 제거 후 substring match + snippet 50자).
+
 ---
 
-마지막 업데이트: 25단계 폴더카드그리드 + 드래그드롭 + 회의제목 인라인 완료.
+마지막 업데이트: 26단계 회의록 자유편집본문 + 검수 fix 완료.
