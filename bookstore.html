@@ -80,6 +80,15 @@
   .main { grid-area: main; min-height: 0; overflow-y: auto; }
   .memo { grid-area: memo; min-height: 0; }
 
+  /* ---- user chip (topbar) ---- */
+  .topbar .top-actions .user-chip { display: inline-flex; align-items: center; gap: 8px; height: 38px; width: auto; padding: 0 12px 0 4px; background: rgba(255,255,255,0.06); border: 1px solid var(--glass-border); border-radius: 12px; color: var(--text); cursor: pointer; font-family: inherit; font-size: 12.5px; transition: 160ms ease; }
+  .topbar .top-actions .user-chip:hover { background: rgba(255,255,255,0.14); border-color: var(--glass-border-strong); }
+  .avatar-xs { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; font-weight: 600; font-size: 12px; color: #fff; flex: 0 0 auto; border: 1.5px solid rgba(35,35,40,0.65); background: rgba(255,255,255,0.10); }
+  .avatar-xs.a-go  { background: linear-gradient(135deg, #7aa1d8, #4f6e9c); }
+  .avatar-xs.a-yu  { background: linear-gradient(135deg, #d8819f, #a14d6f); }
+  .avatar-xs.a-jun { background: linear-gradient(135deg, #7fc89c, #4f8e6c); }
+  .user-chip-name { font-weight: 500; color: var(--text); }
+
   /* ---- topbar (CVENS + global search) ---- */
   .topbar {
     position: relative;
@@ -475,6 +484,39 @@
 
   /* ---- team goals ---- */
   .goals { margin-top: 22px; }
+  .goals-list { display: flex; flex-direction: column; gap: 6px; margin-top: 2px; }
+  .goal-row { display: grid; grid-template-columns: minmax(0, 1fr) auto auto auto; gap: 14px; align-items: center; padding: 10px 14px; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); border-radius: 12px; cursor: pointer; transition: 160ms ease; }
+  .goal-row:hover { background: rgba(255,255,255,0.09); border-color: var(--glass-border-strong); }
+  .gr-left { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+  .gr-name { font-size: 13.5px; color: var(--text); font-weight: 500; line-height: 1.35; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .gr-bar { height: 4px; background: rgba(255,255,255,0.08); border-radius: 999px; overflow: hidden; }
+  .gr-bar > span { display: block; height: 100%; background: linear-gradient(90deg, #7aa1d8, #b07ec8); border-radius: 999px; transition: width 320ms cubic-bezier(.4,.2,.2,1); }
+  .gr-pct { font-size: 14px; font-weight: 600; color: var(--text); font-variant-numeric: tabular-nums; min-width: 42px; text-align: right; }
+  .gr-pct.auto { color: rgba(127,200,156,0.85); }
+  .gr-people { display: flex; align-items: center; flex: 0 0 auto; }
+  .gr-edit { width: 26px; height: 26px; border-radius: 8px; background: rgba(255,255,255,0.06); border: 1px solid var(--glass-border); color: var(--text-dim); display: grid; place-items: center; cursor: pointer; padding: 0; opacity: 0.5; transition: opacity 160ms ease; flex: 0 0 auto; font-family: inherit; }
+  .goal-row:hover .gr-edit { opacity: 1; }
+  .gr-edit:hover { background: var(--accent); border-color: var(--accent-strong); color: var(--text); }
+  .gr-edit svg { width: 13px; height: 13px; }
+  /* goal detail modal */
+  .gd-title { font-size: 18px; font-weight: 600; line-height: 1.3; color: var(--text); }
+  .gd-title-edit { width: 100%; font-size: 17px; font-weight: 600; background: rgba(255,255,255,0.06); border: 1px solid var(--glass-border); border-radius: 10px; padding: 8px 12px; color: var(--text); font-family: inherit; outline: 0; }
+  .gd-meta { display: flex; align-items: center; gap: 12px; margin: 12px 0 16px; padding-bottom: 14px; border-bottom: 1px solid rgba(255,255,255,0.06); flex-wrap: wrap; }
+  .gd-meta .gd-pct-display { display: flex; align-items: baseline; gap: 2px; }
+  .gd-meta .gd-pct-display .pct { font-size: 28px; font-weight: 600; color: var(--text); line-height: 1; }
+  .gd-meta .gd-pct-display .pct-sym { font-size: 13px; color: var(--text-dim); }
+  .gd-meta .gd-pct-note { font-size: 11px; color: var(--text-faint); }
+  .gd-section { margin-bottom: 14px; }
+  .gd-section-title { font-size: 11px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; font-weight: 600; }
+  .gd-edit-toggle { width: 28px; height: 28px; border-radius: 8px; background: rgba(255,255,255,0.06); border: 1px solid var(--glass-border); color: var(--text-dim); display: grid; place-items: center; cursor: pointer; padding: 0; font-family: inherit; transition: 160ms ease; flex: 0 0 auto; }
+  .gd-edit-toggle.active { background: rgba(127,200,156,0.32); border-color: rgba(127,200,156,0.55); color: #fff; }
+  .gd-edit-toggle svg { width: 13px; height: 13px; }
+  /* check-text inline edit (when in edit mode) */
+  .check-text.edit { background: transparent; border: 1px solid var(--glass-border); border-radius: 6px; padding: 2px 6px; outline: 0; color: var(--text); font-size: 13.5px; font-family: inherit; width: 100%; }
+  /* memo inline edit textarea */
+  .bubble .memo-edit-area { width: 100%; min-height: 36px; background: rgba(255,255,255,0.06); border: 1px solid var(--glass-border); border-radius: 8px; color: var(--text); padding: 6px 10px; font-size: 13px; font-family: inherit; outline: 0; resize: vertical; line-height: 1.45; }
+  .bubble.me .memo-edit-area { background: rgba(120,160,220,0.18); border-color: rgba(160,195,240,0.35); }
+  .bubble .memo-edit-hint { font-size: 10px; color: var(--text-faint); margin-top: 4px; }
   .goals-deck {
     position: relative;
     height: 96px;
@@ -630,6 +672,14 @@
   .t-cat-tag.cat-launch { background: rgba(109,200,200,0.22); border-color: rgba(109,200,200,0.45); }
   .t-row-track { position: relative; min-width: 0; }
   .t-row-track .t-bar { top: 50%; transform: translateY(-50%); }
+  .t-bar .t-handle { position: absolute; top: 0; bottom: 0; width: 7px; cursor: ew-resize; background: rgba(255,255,255,0.32); display: none; border-radius: 3px; z-index: 6; }
+  .t-bar:hover .t-handle { display: block; }
+  .t-bar .t-handle.t-handle-l { left: -3px; }
+  .t-bar .t-handle.t-handle-r { right: -3px; }
+  .t-bar.dragging { box-shadow: 0 0 0 2px rgba(255,220,100,0.85); z-index: 10; }
+  .t-row.t-row-add { cursor: pointer; opacity: 0.55; transition: 160ms ease; }
+  .t-row.t-row-add:hover { opacity: 1; background: rgba(255,255,255,0.04); }
+  .t-row.t-row-add .t-row-label { color: var(--text-faint); font-size: 12.5px; font-style: italic; }
   .t-row-empty { padding: 30px 16px; font-size: 12.5px; color: var(--text-faint); text-align: center; }
   /* month axis at top */
   .t-months {
@@ -1446,6 +1496,10 @@
         </div>
         <div class="top-actions">
           <span id="connDot" title="동기화 상태" style="width:8px;height:8px;border-radius:50%;background:#888;align-self:center;margin-right:6px;display:inline-block;"></span>
+          <button class="user-chip" id="userChip" title="담당자 변경">
+            <span class="avatar-xs" id="userChipAvatar">?</span>
+            <span class="user-chip-name" id="whoami">담당자 선택</span>
+          </button>
           <button id="bellBtn" title="알림">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 1 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10 21a2 2 0 0 0 4 0"/></svg>
           </button>
@@ -1515,9 +1569,9 @@
           </section>
 
           <!-- Team Goals -->
-          <section class="goals open" id="goals">
+          <section class="goals" id="goals">
           <header class="section-head">
-            <h3 id="goalsToggle" style="cursor:pointer">팀 목표</h3>
+            <h3>팀 목표</h3>
             <span class="badge" id="goalsBadge">4</span>
             <div class="spacer"></div>
             <button class="edit-toggle" id="editGoals" title="편집">
@@ -1526,9 +1580,8 @@
             <button class="add-btn" id="addGoalBtn" title="추가">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
             </button>
-            <svg class="chevron" id="goalsChev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
           </header>
-          <div class="goals-deck" id="goalsDeck"></div>
+          <div class="goals-list" id="goalsList"></div>
         </section>
         </div>
 
@@ -1589,10 +1642,6 @@
           <div>
             <h3>Memo</h3>
             <div class="sub">Thread · <span id="memoCount">0</span> notes</div>
-            <div class="me-chip" id="meChip" title="사용자 변경">
-              <span class="dot"></span>
-              <span id="whoami">—</span>
-            </div>
           </div>
           <button class="icon-btn" id="memoMoreBtn" title="메모 옵션">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg>
@@ -2495,76 +2544,43 @@
       // GOALS
       // ============================================================
       function renderGoals() {
-        var deck = $('goalsDeck');
-        deck.innerHTML = '';
-        var deckH = 96;
-        deck.style.height = ($('goals').classList.contains('open')
-          ? (Math.ceil(state.goals.length / 2) * (deckH + 12))
-          : deckH) + 'px';
-
-        state.goals.forEach(function (g, i) {
-          var card = el('article', { 'class': 'goal-card' });
-          // collapsed transform (deck stack)
-          var collapsedX = i * 7, collapsedY = i * 4, rot = (i % 2 === 0 ? -1.4 : 1.4);
-          // expanded transform (2x2 grid via translate)
-          var col = i % 2, row = Math.floor(i / 2);
-          var expX = col === 0 ? '0' : 'calc(100% + 12px)';
-          var expY = row * (deckH + 20);
-
-          if ($('goals').classList.contains('open')) {
-            card.style.transform = 'translate(' + expX + ', ' + expY + 'px)';
-            card.style.zIndex = 1;
+        var root = $('goalsList');
+        if (!root) return;
+        root.innerHTML = '';
+        state.goals.forEach(function (g) {
+          if (!g.checklist) g.checklist = [];
+          var pct, auto = false;
+          if (g.checklist.length) {
+            var done = g.checklist.filter(function(x){return x.done;}).length;
+            pct = Math.round(done / g.checklist.length * 100);
+            g.progress = pct;
+            auto = true;
           } else {
-            card.style.transform = 'translate(' + collapsedX + 'px, ' + collapsedY + 'px) rotate(' + rot + 'deg)';
-            card.style.zIndex = (state.goals.length - i);
+            pct = Math.max(0, Math.min(100, g.progress || 0));
           }
-
-          // actions
-          var actions = el('div', { 'class': 'goal-actions' });
-          actions.appendChild(el('button', {
-            title: '편집',
-            onclick: function (e) { e.stopPropagation(); openGoalModal(g); }
-          }, [iconSvg(['M4 17.5V20h2.5L17 9.5 14.5 7 4 17.5z', 'M14 7l3 3'])]));
-          actions.appendChild(el('button', {
-            'class': 'danger', title: '삭제',
-            onclick: function (e) {
-              e.stopPropagation();
-              if (confirm('"' + g.name + '" 목표를 삭제할까요?')) {
-                state.goals = state.goals.filter(function (x) { return x.id !== g.id; });
-                save(KEYS.goals, state.goals);
-                renderGoals();
-              }
-            }
-          }, [iconSvg(['M3 6h18', 'M8 6V4h8v2', 'M6 6l1 14h10l1-14'])]));
-          card.appendChild(actions);
-
-          card.appendChild(el('div', { 'class': 'goal-name' }, g.name));
-
-          var prog = el('div');
-          var progLine = el('div', { 'class': 'goal-progress' });
-          progLine.appendChild(el('span', { 'class': 'pct' }, String(Math.max(0, Math.min(100, g.progress)))));
-          progLine.appendChild(el('span', { 'class': 'pct-sym' }, '%'));
-          prog.appendChild(progLine);
-          var bar = el('div', { 'class': 'goal-bar' });
-          bar.appendChild(el('span', { style: { width: Math.max(0, Math.min(100, g.progress)) + '%' } }));
-          prog.appendChild(bar);
-          card.appendChild(prog);
-
-          var people = el('div', { 'class': 'goal-people' });
+          var row = el('div', { 'class': 'goal-row', 'data-id': g.id, onclick: function () { openGoalDetailModal(g, false); } });
+          var left = el('div', { 'class': 'gr-left' });
+          left.appendChild(el('div', { 'class': 'gr-name', title: g.name }, g.name));
+          var bar = el('div', { 'class': 'gr-bar' });
+          bar.appendChild(el('span', { style: { width: pct + '%' } }));
+          left.appendChild(bar);
+          row.appendChild(left);
+          row.appendChild(el('div', { 'class': 'gr-pct' + (auto ? ' auto' : '') }, pct + '%'));
+          var people = el('div', { 'class': 'gr-people' });
           (g.members || []).forEach(function (m) {
             people.appendChild(el('span', { 'class': 'avatar-sm ' + (AVATAR_CLS[m] || '') }, INITIAL[m] || (m[0] || '?')));
           });
-          card.appendChild(people);
-
-          card.addEventListener('click', function () {
-            openGoalChecklistModal(g);
-          });
-          deck.appendChild(card);
+          row.appendChild(people);
+          var editBtn = el('button', { type: 'button', 'class': 'gr-edit', title: '편집', onclick: function (e) { e.stopPropagation(); openGoalDetailModal(g, true); } });
+          editBtn.appendChild(iconSvg(['M4 17.5V20h2.5L17 9.5 14.5 7 4 17.5z','M14 7l3 3']));
+          row.appendChild(editBtn);
+          root.appendChild(row);
         });
-        $('goalsBadge').textContent = state.goals.length;
+        if ($('goalsBadge')) $('goalsBadge').textContent = state.goals.length;
+        save(KEYS.goals, state.goals);
       }
 
-      function openGoalModal(existing) {
+            function openGoalModal(existing) {
         var data = existing ? Object.assign({ members: [] }, existing) : { id: uid('g'), name: '', progress: 0, members: [] };
         var nameInput = el('input', { type: 'text', value: data.name, placeholder: '예: Q2 신규 사용자 1만명 달성' });
         var pctInput = el('input', { type: 'number', min: '0', max: '100', value: String(data.progress || 0) });
@@ -2616,50 +2632,124 @@
         });
       }
 
-      function openGoalChecklistModal(g) {
+      function openGoalDetailModal(g, startEdit) {
         if (!g.checklist) g.checklist = [];
-        var body = document.createElement('div');
-        var listWrap = document.createElement('div');
-        listWrap.className = 'checklist';
-        function recalcProgress() {
-          if (!g.checklist || !g.checklist.length) return;
-          var done = g.checklist.filter(function(x){return x.done;}).length;
-          g.progress = Math.round(done / g.checklist.length * 100);
-          save(KEYS.goals, state.goals); renderGoals();
-        }
-        function rerender() {
-          listWrap.innerHTML = '';
-          if (!g.checklist.length) {
-            listWrap.appendChild(el('div', { style: { padding: '8px 4px', color: 'var(--text-faint)', fontSize: '13px' } }, '아직 체크리스트 항목이 없습니다. 아래 입력란에 추가해보세요.'));
+        var editing = !!startEdit;
+        var body = el('div');
+        var titleWrap = el('div', { style: { display: 'flex', alignItems: 'center', gap: '8px' } });
+        var titleDisplay = el('div', { 'class': 'gd-title' }, g.name);
+        var titleInput = document.createElement('input');
+        titleInput.type = 'text'; titleInput.value = g.name; titleInput.className = 'gd-title-edit';
+        var editToggle = el('button', { type: 'button', 'class': 'gd-edit-toggle' + (editing ? ' active' : ''), title: '수정 모드' });
+        editToggle.appendChild(iconSvg(['M4 17.5V20h2.5L17 9.5 14.5 7 4 17.5z','M14 7l3 3']));
+        titleWrap.appendChild(titleDisplay);
+        titleWrap.appendChild(titleInput);
+        titleWrap.appendChild(el('div', { style: { flex: 1 } }));
+        titleWrap.appendChild(editToggle);
+        body.appendChild(titleWrap);
+        var meta = el('div', { 'class': 'gd-meta' });
+        var pctDisp = el('div', { 'class': 'gd-pct-display' });
+        var pctNum = el('span', { 'class': 'pct' }, '0');
+        pctDisp.appendChild(pctNum);
+        pctDisp.appendChild(el('span', { 'class': 'pct-sym' }, '%'));
+        meta.appendChild(pctDisp);
+        var pctNote = el('span', { 'class': 'gd-pct-note' }, '');
+        meta.appendChild(pctNote);
+        var membersDisplay = el('div', { 'class': 'gr-people' });
+        meta.appendChild(membersDisplay);
+        body.appendChild(meta);
+        var memberSection = el('div', { 'class': 'gd-section' });
+        memberSection.appendChild(el('div', { 'class': 'gd-section-title' }, '참여자'));
+        var memberRow = el('div', { 'class': 'toggle-list' });
+        var memberSet = new Set(g.members || []);
+        var team = (typeof TEAM !== 'undefined' ? TEAM : ['고동기','이유민','전민욱']);
+        team.forEach(function (m) {
+          var t = el('button', { type: 'button', 'class': 'toggle' + (memberSet.has(m) ? ' on' : ''), onclick: function () {
+            if (memberSet.has(m)) memberSet.delete(m); else memberSet.add(m);
+            t.classList.toggle('on');
+            g.members = Array.from(memberSet);
+            save(KEYS.goals, state.goals); refreshMembersDisplay(); renderGoals();
+          } }, m);
+          memberRow.appendChild(t);
+        });
+        memberSection.appendChild(memberRow);
+        body.appendChild(memberSection);
+        var clSection = el('div', { 'class': 'gd-section' });
+        clSection.appendChild(el('div', { 'class': 'gd-section-title' }, '체크리스트'));
+        var listWrap = el('div', { 'class': 'checklist' });
+        clSection.appendChild(listWrap);
+        var addInp = document.createElement('input');
+        addInp.type = 'text'; addInp.placeholder = '새 체크리스트 항목 Enter';
+        addInp.style.cssText = 'width:100%;height:34px;background:rgba(255,255,255,0.06);border:1px solid var(--glass-border);border-radius:10px;color:var(--text);padding:0 12px;font-size:13px;font-family:inherit;outline:0;margin-top:6px;';
+        addInp.addEventListener('keydown', function (e) {
+          if (e.key === 'Enter') {
+            e.preventDefault(); e.stopPropagation();
+            var v = (addInp.value || '').trim(); if (!v) return;
+            g.checklist.push({ id: uid('chk'), text: v, done: false });
+            addInp.value = '';
+            save(KEYS.goals, state.goals); renderChecklist(); refreshProgress(); renderGoals();
           }
+        });
+        clSection.appendChild(addInp);
+        body.appendChild(clSection);
+        function refreshProgress() {
+          var pct;
+          if (g.checklist.length) { var d = g.checklist.filter(function(x){return x.done;}).length; pct = Math.round(d / g.checklist.length * 100); g.progress = pct; pctNote.textContent = '· 체크리스트 기반 자동'; }
+          else { pct = g.progress || 0; pctNote.textContent = '· 체크리스트 비어있음'; }
+          pctNum.textContent = pct;
+        }
+        function refreshMembersDisplay() {
+          membersDisplay.innerHTML = '';
+          (g.members || []).forEach(function (m) { membersDisplay.appendChild(el('span', { 'class': 'avatar-sm ' + (AVATAR_CLS[m] || '') }, INITIAL[m] || (m[0] || '?'))); });
+        }
+        function renderChecklist() {
+          listWrap.innerHTML = '';
+          if (!g.checklist.length) { listWrap.appendChild(el('div', { style: { padding: '8px 4px', color: 'var(--text-faint)', fontSize: '13px' } }, '아직 체크리스트 항목이 없습니다. 아래 입력란에 추가해보세요.')); return; }
           g.checklist.forEach(function (item, idx) {
             var row = el('div', { 'class': 'checklist-row' });
-            var cb = el('button', { type: 'button', 'class': 'check-box' + (item.done ? ' on' : ''), onclick: function () { item.done = !item.done; cb.classList.toggle('on', item.done); cb.textContent = item.done ? '✓' : ''; row.querySelector('.check-text').classList.toggle('done', item.done); save(KEYS.goals, state.goals); recalcProgress(); } }, item.done ? '✓' : '');
+            var textNode;
+            var cb = el('button', { type: 'button', 'class': 'check-box' + (item.done ? ' on' : ''), onclick: function () {
+              item.done = !item.done; cb.classList.toggle('on', item.done); cb.textContent = item.done ? '✓' : '';
+              if (textNode && textNode.classList) textNode.classList.toggle('done', item.done);
+              save(KEYS.goals, state.goals); refreshProgress(); renderGoals();
+            } }, item.done ? '✓' : '');
             row.appendChild(cb);
-            row.appendChild(el('span', { 'class': 'check-text' + (item.done ? ' done' : '') }, item.text));
-            var del = el('button', { type: 'button', 'class': 'check-del', title: '삭제', onclick: function () { g.checklist.splice(idx, 1); save(KEYS.goals, state.goals); rerender(); recalcProgress(); } }, '×');
-            row.appendChild(del);
+            if (editing) {
+              textNode = document.createElement('input');
+              textNode.type = 'text'; textNode.value = item.text;
+              textNode.className = 'check-text edit' + (item.done ? ' done' : '');
+              textNode.addEventListener('blur', function () { var v = (textNode.value || '').trim(); if (v) { item.text = v; save(KEYS.goals, state.goals); } });
+              textNode.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); textNode.blur(); } });
+            } else {
+              textNode = el('span', { 'class': 'check-text' + (item.done ? ' done' : '') }, item.text);
+            }
+            row.appendChild(textNode);
+            if (editing) {
+              var del = el('button', { type: 'button', 'class': 'check-del', title: '삭제', onclick: function () { g.checklist.splice(idx, 1); save(KEYS.goals, state.goals); renderChecklist(); refreshProgress(); renderGoals(); } }, '×');
+              row.appendChild(del);
+            }
             listWrap.appendChild(row);
           });
         }
-        rerender();
-        body.appendChild(el('div', { style: { fontSize: '14px', fontWeight: 500, color: 'var(--text-dim)', marginBottom: '2px' } }, g.name));
-        body.appendChild(listWrap);
-        var inp = document.createElement('input');
-        inp.type = 'text'; inp.placeholder = '새 항목 입력 후 Enter';
-        inp.style.cssText = 'width:100%;height:36px;background:rgba(255,255,255,0.06);border:1px solid var(--glass-border);border-radius:10px;color:var(--text);padding:0 12px;font-size:13px;font-family:inherit;outline:0;margin-top:10px;';
-        inp.addEventListener('keydown', function (e) {
-          if (e.key === 'Enter') {
-            e.preventDefault(); e.stopPropagation();
-            var v = (inp.value || '').trim();
-            if (!v) return;
-            g.checklist.push({ id: uid('chk'), text: v, done: false });
-            inp.value = '';
-            save(KEYS.goals, state.goals); rerender(); recalcProgress();
-          }
+        function applyEditingMode() {
+          titleDisplay.style.display = editing ? 'none' : '';
+          titleInput.style.display = editing ? '' : 'none';
+          memberSection.style.display = editing ? '' : 'none';
+          editToggle.classList.toggle('active', editing);
+          renderChecklist();
+        }
+        titleInput.addEventListener('input', function () { g.name = titleInput.value; titleDisplay.textContent = g.name; save(KEYS.goals, state.goals); renderGoals(); });
+        editToggle.addEventListener('click', function () { editing = !editing; applyEditingMode(); });
+        refreshMembersDisplay();
+        refreshProgress();
+        applyEditingMode();
+        showModal({
+          title: '목표 상세',
+          sub: editing ? '수정 모드 — 제목/참여자/체크리스트 바로 수정 가능' : '좌측 연필로 수정 모드 전환',
+          body: body, showDelete: true,
+          onDelete: function () { if (confirm('"' + g.name + '" 목표를 삭제할까요?')) { state.goals = state.goals.filter(function (x) { return x.id !== g.id; }); save(KEYS.goals, state.goals); renderGoals(); hideModal(); } },
+          onSave: hideModal
         });
-        body.appendChild(inp);
-        showModal({ title: '체크리스트', sub: (g.checklist.length ? Math.round((g.checklist.filter(function(x){return x.done;}).length / g.checklist.length) * 100) : 0) + '% 완료 · 참여자 ' + ((g.members || []).join(', ') || '없음'), body: body, onSave: hideModal });
       }
 
       // ============================================================
@@ -2673,10 +2763,10 @@
         return Math.max(0, Math.min(100, ((t - s) / (e - s)) * 100));
       }
 
+      function isoOfDate(d) { return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'); }
       function renderTimeline() {
         $('rangeStart').value = state.range.start;
         $('rangeEnd').value = state.range.end;
-
         var months = $('tMonths');
         months.innerHTML = '';
         var ts = new Date(state.range.start + 'T00:00:00');
@@ -2685,23 +2775,17 @@
         if (durationDays <= 18) {
           var cur = new Date(ts);
           while (cur.getTime() <= te.getTime()) {
-            var iso = cur.getFullYear() + '-' + String(cur.getMonth()+1).padStart(2,'0') + '-' + String(cur.getDate()).padStart(2,'0');
+            var iso = isoOfDate(cur);
             var p = pctOf(iso, state.range.start, state.range.end);
-            if (p >= 0 && p <= 100) {
-              months.appendChild(el('div', { 'class': 't-month', style: { left: p + '%' } }, (cur.getMonth()+1) + '/' + cur.getDate()));
-            }
+            if (p >= 0 && p <= 100) months.appendChild(el('div', { 'class': 't-month', style: { left: p + '%' } }, (cur.getMonth()+1) + '/' + cur.getDate()));
             cur.setDate(cur.getDate() + 1);
           }
         } else if (durationDays <= 75) {
-          var cur2 = new Date(ts);
-          var day = cur2.getDay(); var diff = (day === 0 ? -6 : 1 - day);
-          cur2.setDate(cur2.getDate() + diff);
+          var cur2 = new Date(ts); var day = cur2.getDay(); var diff = (day === 0 ? -6 : 1 - day); cur2.setDate(cur2.getDate() + diff);
           while (cur2.getTime() <= te.getTime()) {
-            var iso2 = cur2.getFullYear() + '-' + String(cur2.getMonth()+1).padStart(2,'0') + '-' + String(cur2.getDate()).padStart(2,'0');
+            var iso2 = isoOfDate(cur2);
             var p2 = pctOf(iso2, state.range.start, state.range.end);
-            if (p2 >= 0 && p2 <= 100) {
-              months.appendChild(el('div', { 'class': 't-month', style: { left: p2 + '%' } }, (cur2.getMonth()+1) + '/' + cur2.getDate()));
-            }
+            if (p2 >= 0 && p2 <= 100) months.appendChild(el('div', { 'class': 't-month', style: { left: p2 + '%' } }, (cur2.getMonth()+1) + '/' + cur2.getDate()));
             cur2.setDate(cur2.getDate() + 7);
           }
         } else {
@@ -2716,32 +2800,18 @@
             cursor.setMonth(cursor.getMonth() + 1);
           }
         }
-
         var today = new Date();
-        var todayIso = today.getFullYear() + '-' + String(today.getMonth()+1).padStart(2,'0') + '-' + String(today.getDate()).padStart(2,'0');
+        var todayIso = isoOfDate(today);
         var todayMs = dateToMs(todayIso);
         var tToday = $('tToday');
         if (todayMs >= dateToMs(state.range.start) && todayMs <= dateToMs(state.range.end)) {
           var todayPct = pctOf(todayIso, state.range.start, state.range.end);
           tToday.style.display = 'block';
           tToday.style.left = 'calc(200px + (100% - 200px) * ' + (todayPct/100) + ')';
-        } else {
-          tToday.style.display = 'none';
-        }
-
-        var sorted = state.events.slice().sort(function (a, b) {
-          return dateToMs(a.start) - dateToMs(b.start);
-        });
-
+        } else { tToday.style.display = 'none'; }
+        var sorted = state.events.slice().sort(function (a, b) { return dateToMs(a.start) - dateToMs(b.start); });
         var rowsEl = $('tRows');
         rowsEl.innerHTML = '';
-
-        if (sorted.length === 0) {
-          var empty = el('div', { 'class': 't-row' });
-          empty.appendChild(el('div', { 'class': 't-row-empty', style: { gridColumn: '1 / -1' } }, '아직 일정이 없습니다. 우측 + 버튼으로 추가하세요.'));
-          rowsEl.appendChild(empty);
-        }
-
         sorted.forEach(function (ev) {
           var st = dateToMs(ev.start), en = dateToMs(ev.end || ev.start);
           var leftPct = Math.max(0, pctOf(ev.start, state.range.start, state.range.end));
@@ -2749,46 +2819,50 @@
           var widthPct = Math.max(1.2, endPct - leftPct);
           var status = en < todayMs ? 'done' : (st <= todayMs && en >= todayMs ? 'current' : '');
           var cat = CATEGORIES.find(function (c) { return c.id === ev.category; }) || { name: ev.category };
-
           var row = el('div', { 'class': 't-row', 'data-id': ev.id });
           var lab = el('div', { 'class': 't-row-label' });
           lab.appendChild(el('span', { 'class': 't-cat-tag cat-' + ev.category }, cat.name));
           lab.appendChild(el('span', { 'class': 't-row-name' }, ev.title));
           row.appendChild(lab);
-
           var track = el('div', { 'class': 't-row-track' });
-          var bar = el('div', {
-            'class': 't-bar cat-' + ev.category + (status ? ' ' + status : ''),
-            'data-id': ev.id,
-            style: { left: leftPct + '%', width: widthPct + '%' },
-            onclick: function () { if (bar.closest('.editing')) openEventModal(ev); }
-          });
+          var bar = el('div', { 'class': 't-bar cat-' + ev.category + (status ? ' ' + status : ''), 'data-id': ev.id, style: { left: leftPct + '%', width: widthPct + '%' }, onclick: function () { if (bar.closest('.editing')) openEventModal(ev); } });
           var rangeText = fmtMd(ev.start) + (ev.end && ev.end !== ev.start ? ' → ' + fmtMd(ev.end) : '');
           bar.appendChild(el('span', { 'class': 't-bar-title' }, ev.title));
           bar.appendChild(el('span', { 'class': 't-bar-dates' }, rangeText));
-
           var actions = el('div', { 'class': 't-actions' });
-          actions.appendChild(el('button', {
-            title: '편집',
-            onclick: function (e2) { e2.stopPropagation(); openEventModal(ev); }
-          }, [iconSvg(['M4 17.5V20h2.5L17 9.5 14.5 7 4 17.5z', 'M14 7l3 3'])]));
-          actions.appendChild(el('button', {
-            'class': 'danger', title: '삭제',
-            onclick: function (e2) {
-              e2.stopPropagation();
-              if (confirm('"' + ev.title + '" 일정을 삭제할까요?')) {
-                state.events = state.events.filter(function (x) { return x.id !== ev.id; });
-                save(KEYS.events, state.events);
-                renderTimeline();
-              }
-            }
-          }, [iconSvg(['M3 6h18', 'M8 6V4h8v2', 'M6 6l1 14h10l1-14'])]));
+          actions.appendChild(el('button', { title: '편집', onclick: function (e2) { e2.stopPropagation(); openEventModal(ev); } }, [iconSvg(['M4 17.5V20h2.5L17 9.5 14.5 7 4 17.5z','M14 7l3 3'])]));
+          actions.appendChild(el('button', { 'class': 'danger', title: '삭제', onclick: function (e2) { e2.stopPropagation(); if (confirm('"' + ev.title + '" 일정을 삭제할까요?')) { state.events = state.events.filter(function (x) { return x.id !== ev.id; }); save(KEYS.events, state.events); renderTimeline(); } } }, [iconSvg(['M3 6h18','M8 6V4h8v2','M6 6l1 14h10l1-14'])]));
           bar.appendChild(actions);
+          ['l','r'].forEach(function (side) {
+            var h = el('div', { 'class': 't-handle t-handle-' + side });
+            h.addEventListener('mousedown', function (e0) {
+              e0.preventDefault(); e0.stopPropagation();
+              var trackRect = track.getBoundingClientRect();
+              var startX = e0.clientX;
+              bar.classList.add('dragging');
+              function mv(e2) { var dx = e2.clientX - startX; var dPct = (dx / trackRect.width) * 100; startX = e2.clientX; if (side === 'l') { var nl = Math.max(0, parseFloat(bar.style.left) + dPct); var nw = parseFloat(bar.style.width) - dPct; if (nw < 1) return; bar.style.left = nl + '%'; bar.style.width = nw + '%'; } else { var nw2 = Math.max(1, parseFloat(bar.style.width) + dPct); var lp = parseFloat(bar.style.left); if (lp + nw2 > 100) nw2 = 100 - lp; bar.style.width = nw2 + '%'; } }
+              function up() { document.removeEventListener('mousemove', mv); document.removeEventListener('mouseup', up); bar.classList.remove('dragging'); var sMs = dateToMs(state.range.start), eMs = dateToMs(state.range.end); var rangeMs = eMs - sMs; var lp = parseFloat(bar.style.left), wp = parseFloat(bar.style.width); var nsMs = sMs + (lp/100)*rangeMs; var neMs = sMs + ((lp+wp)/100)*rangeMs; ev.start = isoOfDate(new Date(nsMs)); ev.end = isoOfDate(new Date(neMs)); save(KEYS.events, state.events); renderTimeline(); }
+              document.addEventListener('mousemove', mv);
+              document.addEventListener('mouseup', up);
+            });
+            bar.appendChild(h);
+          });
           track.appendChild(bar);
           row.appendChild(track);
           rowsEl.appendChild(row);
         });
-
+        var addRow = el('div', { 'class': 't-row t-row-add', onclick: function () {
+          var now = new Date();
+          var endDt = new Date(now.getTime() + 7 * 86400000);
+          var ev = { id: uid('e'), title: '새 일정', start: isoOfDate(now), end: isoOfDate(endDt), category: 'plan' };
+          state.events.push(ev); save(KEYS.events, state.events);
+          renderTimeline(); openEventModal(ev);
+        } });
+        var addLab = el('div', { 'class': 't-row-label' });
+        addLab.appendChild(el('span', null, '+ 새 일정 추가'));
+        addRow.appendChild(addLab);
+        addRow.appendChild(el('div', { 'class': 't-row-track' }));
+        rowsEl.appendChild(addRow);
         $('timelineBadge').textContent = state.events.length + ' 항목';
       }
 
@@ -2864,7 +2938,7 @@
           b.appendChild(meta);
           if (m.author === state.user) {
             var bact = el('div', { 'class': 'b-actions' });
-            bact.appendChild(el('button', { title: '편집', onclick: function (e) { e.stopPropagation(); openMemoModal(m); } }, [iconSvg(['M4 17.5V20h2.5L17 9.5 14.5 7 4 17.5z', 'M14 7l3 3'])]));
+            bact.appendChild(el('button', { title: '편집', onclick: function (e) { e.stopPropagation(); startMemoInlineEdit(b, m); } }, [iconSvg(['M4 17.5V20h2.5L17 9.5 14.5 7 4 17.5z', 'M14 7l3 3'])]));
             bact.appendChild(el('button', { 'class': 'danger', title: '삭제', onclick: function (e) { e.stopPropagation(); if (confirm('이 메모를 삭제할까요?')) { state.memos = state.memos.filter(function (x) { return x.id !== m.id; }); save(KEYS.memos, state.memos); renderMemos(); } } }, [iconSvg(['M3 6h18', 'M8 6V4h8v2', 'M6 6l1 14h10l1-14'])]));
             b.appendChild(bact);
           }
@@ -2911,7 +2985,33 @@
         thread.scrollTop = thread.scrollHeight;
       }
 
-            function openMemoModal(m) {
+            function startMemoInlineEdit(b, m) {
+        if (m.author !== state.user) return;
+        var firstNode = b.firstChild;
+        if (!firstNode || firstNode.nodeType !== 3) return;
+        var ta = document.createElement('textarea');
+        ta.value = m.text;
+        ta.className = 'memo-edit-area';
+        ta.rows = Math.max(2, Math.ceil((m.text || '').length / 36));
+        b.replaceChild(ta, firstNode);
+        Array.from(b.querySelectorAll('.b-actions, .reply-btn, .b-replies, .b-reply-input')).forEach(function (n) { n.style.display = 'none'; });
+        var hint = document.createElement('div');
+        hint.className = 'memo-edit-hint';
+        hint.textContent = 'Enter 저장 · Shift+Enter 줄바꿈 · Esc 취소';
+        ta.parentNode.insertBefore(hint, ta.nextSibling);
+        ta.focus();
+        ta.setSelectionRange(ta.value.length, ta.value.length);
+        var done = false;
+        function commit() { if (done) return; done = true; var v = (ta.value || '').trim(); if (v) m.text = v; save(KEYS.memos, state.memos); renderMemos(); }
+        function cancel() { if (done) return; done = true; renderMemos(); }
+        ta.addEventListener('keydown', function (e) {
+          if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); commit(); }
+          else if (e.key === 'Escape') { e.preventDefault(); cancel(); }
+        });
+        ta.addEventListener('blur', function () { setTimeout(commit, 0); });
+      }
+
+      function openMemoModal(m) {
         var textI = document.createElement('textarea');
         textI.value = m.text;
         textI.rows = 4;
@@ -2982,6 +3082,15 @@
       // USER PICKER
       // ============================================================
       function showPicker() { $('picker').classList.add('show'); }
+      function renderUserChip() {
+        var name = state.user;
+        var av = $('userChipAvatar');
+        if (av) {
+          if (name && AVATAR_CLS[name]) { av.className = 'avatar-xs ' + AVATAR_CLS[name]; av.textContent = INITIAL[name] || (name[0] || '?'); }
+          else { av.className = 'avatar-xs'; av.textContent = '?'; }
+        }
+        var w = $('whoami'); if (w) w.textContent = name || '\ub2f4\ub2f9\uc790 \uc120\ud0dd';
+      }
       function hidePicker() { $('picker').classList.remove('show'); }
       $('pickerList').addEventListener('click', function (e) {
         var btn = e.target.closest('button[data-name]');
@@ -2990,20 +3099,17 @@
         if (TEAM.indexOf(name) === -1) return;
         state.user = name;
         save(KEYS.user, name);
-        $('whoami').textContent = name;
+        renderUserChip();
         renderMemos();
+        renderTeam();
         hidePicker();
       });
-      $('meChip').addEventListener('click', showPicker);
+      if ($('userChip')) $('userChip').addEventListener('click', showPicker);
 
       // ============================================================
       // GOALS toggle
       // ============================================================
-      $('goalsToggle').addEventListener('click', function () {
-        $('goals').classList.toggle('open');
-        $('goalsChev').style.transform = $('goals').classList.contains('open') ? 'rotate(180deg)' : '';
-        renderGoals();
-      });
+      // goalsToggle removed in P5 (list layout, no deck collapse)
 
       // ============================================================
       // ADD BUTTONS
@@ -3318,9 +3424,8 @@
         });
       }
       attachFirebaseListeners();
-      if (state.user && TEAM.indexOf(state.user) !== -1) {
-        $('whoami').textContent = state.user;
-      } else {
+      renderUserChip();
+      if (!(state.user && TEAM.indexOf(state.user) !== -1)) {
         showPicker();
       }
     })();
