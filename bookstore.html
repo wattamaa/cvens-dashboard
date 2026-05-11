@@ -795,17 +795,17 @@
   .meeting-list {
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 8px;
     margin-bottom: 24px;
-    padding: 4px;
+    padding: 6px;
     background: rgba(255,255,255,0.02);
     border: 1px solid var(--glass-border);
     border-radius: 14px;
-    max-height: 240px;
-    overflow-y: auto;
-    scrollbar-width: thin;
-    scrollbar-color: rgba(255,255,255,0.18) transparent;
   }
+  .ml-row { display: flex; flex-direction: column; }
+  .ml-row.active > .ml-item { border-bottom-left-radius: 0; border-bottom-right-radius: 0; background: rgba(120,160,220,0.22); border-color: rgba(160,195,240,0.40); }
+  .ml-detail { display: none; padding: 18px 20px 24px; border-radius: 0 0 10px 10px; background: rgba(255,255,255,0.025); border: 1px solid rgba(255,255,255,0.05); border-top: 0; margin-top: -2px; }
+  .ml-row.active > .ml-detail { display: block; }
   .meeting-list::-webkit-scrollbar { width: 6px; }
   .meeting-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.16); border-radius: 6px; }
   .meeting-list:empty { display: none; }
@@ -859,9 +859,10 @@
     color: var(--text-faint);
     font-size: 12px;
     flex: 0 0 auto;
-    opacity: 0;
+    opacity: 0.55;
     transition: 160ms ease;
   }
+  .ml-item:hover .ml-arrow { opacity: 1; }
   .ml-item.active .ml-arrow { opacity: 1; color: var(--text); }
 
   .callout {
@@ -1493,7 +1494,6 @@
           </button>
         </div>
         <div class="meeting-list" id="meetingList"></div>
-        <div class="meeting-page" id="meetingPage"></div>
       </div>
       </main>
 
@@ -2147,36 +2147,29 @@
       function renderMeetings() {
         var listEl = $('meetingList');
         listEl.innerHTML = '';
+        $('sortMeetingBtn').textContent = state.meetingSortDesc ? '최신순 ↓' : '오래된순 ↑';
+        $('meetingTitle').textContent = '회의록';
         if (!state.meetings.length) {
-          $('meetingTitle').textContent = '회의록';
-          $('meetingPage').innerHTML = '';
-          $('meetingPage').appendChild(el('div', {
-            style: { padding: '60px 20px', textAlign: 'center', color: 'var(--text-faint)', fontSize: '14px' }
-          }, '아직 회의록이 없습니다. 우측 + 버튼으로 새 회의를 추가하세요.'));
-          $('sortMeetingBtn').textContent = state.meetingSortDesc ? '최신순 ↓' : '오래된순 ↑';
+          listEl.appendChild(el('div', { 'class': 'ml-empty' }, '아직 회의록이 없습니다. 우측 + 버튼으로 새 회의를 추가하세요.'));
           return;
         }
         var sorted = state.meetings.slice().sort(function (a, b) {
           return state.meetingSortDesc ? b.date.localeCompare(a.date) : a.date.localeCompare(b.date);
         });
-        // ensure currentMeetingId points to a real meeting
         if (!state.currentMeetingId || !state.meetings.find(function (m) { return m.id === state.currentMeetingId; })) {
           state.currentMeetingId = sorted[0].id;
           save(KEYS.currentMeeting, state.currentMeetingId);
         }
-        var current = state.meetings.find(function (m) { return m.id === state.currentMeetingId; });
-
-        // sort button label
-        $('sortMeetingBtn').textContent = state.meetingSortDesc ? '최신순 ↓' : '오래된순 ↑';
-
-        // render list
         sorted.forEach(function (mt) {
+          var isActive = mt.id === state.currentMeetingId;
+          var rowWrap = el('div', { 'class': 'ml-row' + (isActive ? ' active' : '') });
           var item = el('div', {
-            'class': 'ml-item' + (mt.id === current.id ? ' active' : ''),
+            'class': 'ml-item' + (isActive ? ' active' : ''),
             'data-id': mt.id,
             onclick: function () {
-              state.currentMeetingId = mt.id;
-              save(KEYS.currentMeeting, mt.id);
+              if (state.currentMeetingId === mt.id) { state.currentMeetingId = null; }
+              else { state.currentMeetingId = mt.id; }
+              save(KEYS.currentMeeting, state.currentMeetingId);
               renderMeetings();
             }
           });
@@ -2186,102 +2179,63 @@
           if (mt.decisions && mt.decisions.length) statBits.push('결정 ' + mt.decisions.length);
           if (mt.issues && mt.issues.length) statBits.push('이슈 ' + mt.issues.length);
           item.appendChild(el('span', { 'class': 'ml-stats' }, statBits.join(' · ')));
-          item.appendChild(el('span', { 'class': 'ml-arrow' }, '►'));
-          listEl.appendChild(item);
+          item.appendChild(el('span', { 'class': 'ml-arrow' }, isActive ? '▼' : '▶'));
+          rowWrap.appendChild(item);
+          if (isActive) {
+            var detail = el('div', { 'class': 'ml-detail' });
+            buildMeetingDetail(detail, mt);
+            rowWrap.appendChild(detail);
+          }
+          listEl.appendChild(rowWrap);
         });
+      }
 
-        $('meetingTitle').textContent = fmtMeetingDateLabel(current.date) + '_ ' + current.title;
-
-        var page = $('meetingPage');
-        page.innerHTML = '';
-
-        // 데일리 미팅 준수 사항
+      function buildMeetingDetail(page, current) {
         page.appendChild(makeCallout('co-gray', '📌', '데일리 미팅 준수 사항'));
         var rules = el('div', { 'class': 'm-section' });
         var rulesUl = el('ul');
-        ['미팅 아젠다 및 개인 이슈들은 회의 전에 모두 기재 부탁드립니다.',
-         '미팅은 특이사항 없으면 10:30분 고정 진행 됩니다.',
-         '미팅 소요시간은 30-60분 입니다'].forEach(function (t) {
-          rulesUl.appendChild(el('li', null, t));
-        });
-        rules.appendChild(rulesUl);
-        page.appendChild(rules);
-
-        // meta block
+        ['미팅 아젠다 및 개인 이슈들은 회의 전에 모두 기재 부탁드립니다.', '미팅은 특이사항 없으면 10:30분 고정 진행 됩니다.', '미팅 소요시간은 30-60분 입니다'].forEach(function (t) { rulesUl.appendChild(el('li', null, t)); });
+        rules.appendChild(rulesUl); page.appendChild(rules);
         var meta = el('div', { 'class': 'meta-list' });
         var attLine = el('div'); attLine.appendChild(el('b', null, '미팅 참석자')); attLine.appendChild(document.createTextNode((current.attendees || []).join(', ')));
-        var locLine = el('div'); locLine.appendChild(el('b', null, '미팅 장소'));   locLine.appendChild(document.createTextNode(current.location || ''));
-        var noLine  = el('div'); noLine.appendChild(el('b', null, '특이 사항'));    noLine.appendChild(document.createTextNode(current.notes || '없음'));
-        meta.appendChild(attLine); meta.appendChild(locLine); meta.appendChild(noLine);
-        page.appendChild(meta);
-
-        // 대표 공지 사항 (blue)
+        var locLine = el('div'); locLine.appendChild(el('b', null, '미팅 장소')); locLine.appendChild(document.createTextNode(current.location || ''));
+        var noLine = el('div'); noLine.appendChild(el('b', null, '특이 사항')); noLine.appendChild(document.createTextNode(current.notes || '없음'));
+        meta.appendChild(attLine); meta.appendChild(locLine); meta.appendChild(noLine); page.appendChild(meta);
         page.appendChild(makeCallout('co-blue', '📢', '대표 공지 사항'));
         var ann = el('div', { 'class': 'm-section' });
         if (current.announcements && current.announcements.trim()) {
-          current.announcements.split('\n').forEach(function (line) {
-            if (line.trim()) ann.appendChild(el('p', null, line));
-          });
-        } else {
-          ann.appendChild(el('div', { 'class': 'empty' }, '공지 사항이 없습니다.'));
-        }
+          current.announcements.split('\n').forEach(function (line) { if (line.trim()) ann.appendChild(el('p', null, line)); });
+        } else { ann.appendChild(el('div', { 'class': 'empty' }, '공지 사항이 없습니다.')); }
         page.appendChild(ann);
-
-        page.appendChild(el('div', { 'class': 'm-section' }, [
-          el('h2', null, '중요하게 공유하실 사항 있으시면 기재 부탁드립니다')
-        ]));
-
-        // 팀 내 이슈 사항 (red)
+        page.appendChild(el('div', { 'class': 'm-section' }, [ el('h2', null, '중요하게 공유하실 사항 있으시면 기재 부탁드립니다') ]));
         page.appendChild(makeCallout('co-red', '⚠️', '팀 내 이슈 사항'));
         var iss = el('div', { 'class': 'm-section' });
-        if (current.issues && current.issues.length) {
-          var u = el('ul');
-          current.issues.forEach(function (x) { u.appendChild(el('li', null, x)); });
-          iss.appendChild(u);
-        } else {
-          iss.appendChild(el('div', { 'class': 'empty' }, '이슈가 없습니다.'));
-        }
+        if (current.issues && current.issues.length) { var u = el('ul'); current.issues.forEach(function (x) { u.appendChild(el('li', null, x)); }); iss.appendChild(u); }
+        else { iss.appendChild(el('div', { 'class': 'empty' }, '이슈가 없습니다.')); }
         page.appendChild(iss);
-
-        // 팀원 별 공유 사항 (brown)
         page.appendChild(makeCallout('co-brown', '📍', '팀원 별 공유 사항'));
         var sharesSec = el('div', { 'class': 'm-section' });
         var table = el('table', { 'class': 'share-table' });
         var hr = el('tr', null, [el('th', null, '팀원'), el('th', null, '공유 내용')]);
         table.appendChild(hr);
-        ['고동기', '전민욱', '이유민'].forEach(function (name) {
-          var r = el('tr');
-          r.appendChild(el('th', null, name));
+        (typeof TEAM !== 'undefined' ? TEAM : ['고동기', '전민욱', '이유민']).forEach(function (name) {
+          var r = el('tr'); r.appendChild(el('th', null, name));
           var td = el('td', null, (current.shares && current.shares[name]) ? current.shares[name] : '');
-          r.appendChild(td);
-          table.appendChild(r);
+          r.appendChild(td); table.appendChild(r);
         });
-        sharesSec.appendChild(table);
-        page.appendChild(sharesSec);
-
-        // 미팅 내 결정사항 및 특이사항 (green)
+        sharesSec.appendChild(table); page.appendChild(sharesSec);
         page.appendChild(makeCallout('co-green', '💡', '미팅 내 결정사항 및 특이사항'));
         var dec = el('div', { 'class': 'm-section' });
         dec.appendChild(el('h3', null, '결정 사항'));
-        if (current.decisions && current.decisions.length) {
-          var u2 = el('ul');
-          current.decisions.forEach(function (x) { u2.appendChild(el('li', null, x)); });
-          dec.appendChild(u2);
-        } else {
-          dec.appendChild(el('div', { 'class': 'empty' }, '아직 없습니다.'));
-        }
+        if (current.decisions && current.decisions.length) { var u2 = el('ul'); current.decisions.forEach(function (x) { u2.appendChild(el('li', null, x)); }); dec.appendChild(u2); }
+        else { dec.appendChild(el('div', { 'class': 'empty' }, '아직 없습니다.')); }
         dec.appendChild(el('h3', null, '특이사항'));
-        if (current.specials && current.specials.length) {
-          var u3 = el('ul');
-          current.specials.forEach(function (x) { u3.appendChild(el('li', null, x)); });
-          dec.appendChild(u3);
-        } else {
-          dec.appendChild(el('div', { 'class': 'empty' }, '아직 없습니다.'));
-        }
+        if (current.specials && current.specials.length) { var u3 = el('ul'); current.specials.forEach(function (x) { u3.appendChild(el('li', null, x)); }); dec.appendChild(u3); }
+        else { dec.appendChild(el('div', { 'class': 'empty' }, '아직 없습니다.')); }
         page.appendChild(dec);
       }
 
-      function makeTextarea(value, rows) {
+            function makeTextarea(value, rows) {
         var t = document.createElement('textarea');
         t.value = value || '';
         t.rows = rows || 3;
