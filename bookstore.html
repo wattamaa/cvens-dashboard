@@ -858,6 +858,25 @@
   .meeting-toolbar svg { width: 16px; height: 16px; }
 
   .meeting-page { padding-bottom: 24px; }
+  /* inline editable text (meeting fields) */
+  [data-editable] { outline: 0; border-radius: 6px; padding: 2px 6px; margin: -2px -6px; transition: background 160ms ease, outline-color 160ms ease; cursor: text; min-height: 18px; }
+  [data-editable]:hover { background: rgba(255,255,255,0.04); outline: 1px dashed var(--glass-border); }
+  [data-editable]:focus { background: rgba(255,255,255,0.08); outline: 1px solid var(--accent-strong); }
+  [data-editable]:empty::before { content: attr(data-placeholder); color: var(--text-faint); font-style: italic; }
+  .mt-page-title { font-size: 22px; font-weight: 600; color: var(--text); letter-spacing: -0.01em; margin: 0 0 6px; line-height: 1.3; }
+  .mt-date-line { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; padding-bottom: 14px; border-bottom: 1px solid rgba(255,255,255,0.06); }
+  .mt-date-line input[type="date"] { background: transparent; border: 1px solid var(--glass-border); border-radius: 8px; color: var(--text); padding: 4px 8px; font-family: inherit; font-size: 12.5px; color-scheme: dark; outline: 0; }
+  .mt-date-line input[type="date"]:focus { border-color: var(--accent-strong); }
+  .mt-add { width: 100%; padding: 8px 12px; background: transparent; border: 1px dashed var(--glass-border); border-radius: 10px; color: var(--text-faint); font-size: 13px; cursor: pointer; font-family: inherit; display: flex; align-items: center; justify-content: center; gap: 4px; transition: 160ms ease; margin-top: 6px; }
+  .mt-add:hover { border-color: var(--accent-strong); color: var(--text); background: rgba(255,255,255,0.04); }
+  .mt-li { display: flex; align-items: flex-start; gap: 10px; padding: 4px 0 4px 18px; position: relative; }
+  .mt-li::before { content: ''; position: absolute; left: 6px; top: 13px; width: 5px; height: 5px; border-radius: 50%; background: var(--text-faint); }
+  .mt-li [data-editable] { flex: 1; }
+  .mt-li .mt-li-del { width: 20px; height: 20px; border-radius: 6px; background: transparent; border: 0; color: var(--text-faint); cursor: pointer; padding: 0; font-size: 13px; line-height: 1; opacity: 0; transition: opacity 160ms ease; }
+  .mt-li:hover .mt-li-del { opacity: 1; }
+  .mt-li .mt-li-del:hover { color: #fff; background: rgba(220,90,90,0.35); }
+  .share-table td [data-editable] { display: block; min-height: 18px; }
+  .share-table th [data-editable] { display: block; }
 
   .sort-btn {
     height: 32px;
@@ -2381,51 +2400,122 @@
       }
 
       function buildMeetingDetail(page, current) {
+        function persist() { save(KEYS.meetings, state.meetings); }
+        function makeEditable(elem, multiline, placeholder, onCommit) {
+          elem.contentEditable = 'true';
+          elem.spellcheck = false;
+          elem.setAttribute('data-editable', '1');
+          if (placeholder) elem.setAttribute('data-placeholder', placeholder);
+          var orig = elem.textContent;
+          elem.addEventListener('focus', function () { orig = elem.textContent; });
+          elem.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter' && !multiline && !e.shiftKey) { e.preventDefault(); elem.blur(); }
+            else if (e.key === 'Escape') { e.preventDefault(); elem.textContent = orig; elem.blur(); }
+          });
+          elem.addEventListener('blur', function () { var v = elem.textContent; if (v !== orig) { onCommit(v); persist(); } });
+          return elem;
+        }
+        var team = (typeof TEAM !== 'undefined' ? TEAM : ['고동기','이유민','전민욱']);
+        // Title (inline editable)
+        var titleH = el('div', { 'class': 'mt-page-title' }, current.title || '');
+        makeEditable(titleH, false, '제목 없음', function (v) { current.title = v.trim() || '제목 없음'; renderMeetings(); });
+        page.appendChild(titleH);
+        // Date + attendee count
+        var dateLine = el('div', { 'class': 'mt-date-line' });
+        var dateI = document.createElement('input');
+        dateI.type = 'date'; dateI.value = current.date || '';
+        dateI.addEventListener('change', function () { current.date = dateI.value; persist(); renderMeetings(); });
+        dateLine.appendChild(dateI);
+        var attCount = el('span', { style: { fontSize: '12px', color: 'var(--text-dim)' } }, '참석 ' + (current.attendees || []).length + '명');
+        dateLine.appendChild(attCount);
+        page.appendChild(dateLine);
+        // Daily rules (fixed)
         page.appendChild(makeCallout('co-gray', '📌', '데일리 미팅 준수 사항'));
         var rules = el('div', { 'class': 'm-section' });
         var rulesUl = el('ul');
         ['미팅 아젠다 및 개인 이슈들은 회의 전에 모두 기재 부탁드립니다.', '미팅은 특이사항 없으면 10:30분 고정 진행 됩니다.', '미팅 소요시간은 30-60분 입니다'].forEach(function (t) { rulesUl.appendChild(el('li', null, t)); });
         rules.appendChild(rulesUl); page.appendChild(rules);
+        // Meta block (attendees / location / notes)
         var meta = el('div', { 'class': 'meta-list' });
-        var attLine = el('div'); attLine.appendChild(el('b', null, '미팅 참석자')); attLine.appendChild(document.createTextNode((current.attendees || []).join(', ')));
-        var locLine = el('div'); locLine.appendChild(el('b', null, '미팅 장소')); locLine.appendChild(document.createTextNode(current.location || ''));
-        var noLine = el('div'); noLine.appendChild(el('b', null, '특이 사항')); noLine.appendChild(document.createTextNode(current.notes || '없음'));
-        meta.appendChild(attLine); meta.appendChild(locLine); meta.appendChild(noLine); page.appendChild(meta);
+        var attLine = el('div'); attLine.appendChild(el('b', null, '미팅 참석자'));
+        var attBox = el('span', { style: { display: 'inline-flex', gap: '4px', flexWrap: 'wrap', verticalAlign: 'middle' } });
+        team.forEach(function (m) {
+          var on = (current.attendees || []).indexOf(m) >= 0;
+          var t = el('button', { type: 'button', 'class': 'toggle' + (on ? ' on' : ''), style: { padding: '2px 8px', fontSize: '11px' }, onclick: function () { if (!current.attendees) current.attendees = []; var idx = current.attendees.indexOf(m); if (idx >= 0) current.attendees.splice(idx, 1); else current.attendees.push(m); persist(); renderMeetings(); } }, m);
+          attBox.appendChild(t);
+        });
+        attLine.appendChild(attBox); meta.appendChild(attLine);
+        var locLine = el('div'); locLine.appendChild(el('b', null, '미팅 장소'));
+        var locSpan = el('span', null, current.location || '');
+        makeEditable(locSpan, false, '장소 입력', function (v) { current.location = v.trim(); });
+        locLine.appendChild(locSpan); meta.appendChild(locLine);
+        var noLine = el('div'); noLine.appendChild(el('b', null, '특이 사항'));
+        var noSpan = el('span', null, current.notes || '');
+        makeEditable(noSpan, false, '특이사항 없음', function (v) { current.notes = v.trim(); });
+        noLine.appendChild(noSpan); meta.appendChild(noLine);
+        page.appendChild(meta);
+        // 대표 공지 (multiline editable)
         page.appendChild(makeCallout('co-blue', '📢', '대표 공지 사항'));
         var ann = el('div', { 'class': 'm-section' });
-        if (current.announcements && current.announcements.trim()) {
-          current.announcements.split('\n').forEach(function (line) { if (line.trim()) ann.appendChild(el('p', null, line)); });
-        } else { ann.appendChild(el('div', { 'class': 'empty' }, '공지 사항이 없습니다.')); }
-        page.appendChild(ann);
+        var annP = el('p', { style: { whiteSpace: 'pre-wrap' } }, current.announcements || '');
+        makeEditable(annP, true, '공지 사항이 있으면 클릭해서 입력하세요.', function (v) { current.announcements = v; });
+        ann.appendChild(annP); page.appendChild(ann);
         page.appendChild(el('div', { 'class': 'm-section' }, [ el('h2', null, '중요하게 공유하실 사항 있으시면 기재 부탁드립니다') ]));
+        function renderList(items, container) {
+          container.innerHTML = '';
+          items.forEach(function (text, idx) {
+            var li = el('div', { 'class': 'mt-li' });
+            var sp = el('span', null, text);
+            makeEditable(sp, false, '항목 입력', function (v) { var nv = v.trim(); if (nv) { items[idx] = nv; } else { items.splice(idx, 1); renderMeetings(); } });
+            li.appendChild(sp);
+            var del = el('button', { type: 'button', 'class': 'mt-li-del', title: '삭제', onclick: function () { items.splice(idx, 1); persist(); renderMeetings(); } }, '×');
+            li.appendChild(del); container.appendChild(li);
+          });
+          var addBtn = el('button', { type: 'button', 'class': 'mt-add', onclick: function () { items.push(''); persist(); renderMeetings(); setTimeout(function () { var allInputs = document.querySelectorAll('.mt-li [data-editable]'); if (allInputs.length) allInputs[allInputs.length - 1].focus(); }, 50); } }, '+ 항목 추가');
+          container.appendChild(addBtn);
+        }
+        // 이슈
         page.appendChild(makeCallout('co-red', '⚠️', '팀 내 이슈 사항'));
         var iss = el('div', { 'class': 'm-section' });
-        if (current.issues && current.issues.length) { var u = el('ul'); current.issues.forEach(function (x) { u.appendChild(el('li', null, x)); }); iss.appendChild(u); }
-        else { iss.appendChild(el('div', { 'class': 'empty' }, '이슈가 없습니다.')); }
-        page.appendChild(iss);
+        if (!current.issues) current.issues = [];
+        renderList(current.issues, iss); page.appendChild(iss);
+        // 공유
         page.appendChild(makeCallout('co-brown', '📍', '팀원 별 공유 사항'));
         var sharesSec = el('div', { 'class': 'm-section' });
         var table = el('table', { 'class': 'share-table' });
         var hr = el('tr', null, [el('th', null, '팀원'), el('th', null, '공유 내용')]);
         table.appendChild(hr);
-        (typeof TEAM !== 'undefined' ? TEAM : ['고동기', '전민욱', '이유민']).forEach(function (name) {
+        team.forEach(function (name) {
           var r = el('tr'); r.appendChild(el('th', null, name));
-          var td = el('td', null, (current.shares && current.shares[name]) ? current.shares[name] : '');
-          r.appendChild(td); table.appendChild(r);
+          var tdContent = el('div', null, (current.shares && current.shares[name]) || '');
+          makeEditable(tdContent, true, '공유 내용 입력', function (v) { if (!current.shares) current.shares = {}; current.shares[name] = v; });
+          var td = el('td'); td.appendChild(tdContent); r.appendChild(td); table.appendChild(r);
         });
         sharesSec.appendChild(table); page.appendChild(sharesSec);
+        // 결정 + 특이
         page.appendChild(makeCallout('co-green', '💡', '미팅 내 결정사항 및 특이사항'));
         var dec = el('div', { 'class': 'm-section' });
         dec.appendChild(el('h3', null, '결정 사항'));
-        if (current.decisions && current.decisions.length) { var u2 = el('ul'); current.decisions.forEach(function (x) { u2.appendChild(el('li', null, x)); }); dec.appendChild(u2); }
-        else { dec.appendChild(el('div', { 'class': 'empty' }, '아직 없습니다.')); }
+        if (!current.decisions) current.decisions = [];
+        var decBox = el('div'); dec.appendChild(decBox); renderList(current.decisions, decBox);
         dec.appendChild(el('h3', null, '특이사항'));
-        if (current.specials && current.specials.length) { var u3 = el('ul'); current.specials.forEach(function (x) { u3.appendChild(el('li', null, x)); }); dec.appendChild(u3); }
-        else { dec.appendChild(el('div', { 'class': 'empty' }, '아직 없습니다.')); }
+        if (!current.specials) current.specials = [];
+        var spBox = el('div'); dec.appendChild(spBox); renderList(current.specials, spBox);
         page.appendChild(dec);
       }
 
-            function makeTextarea(value, rows) {
+      function createBlankMeeting() {
+        var nd = new Date();
+        var ds = nd.getFullYear() + '-' + String(nd.getMonth()+1).padStart(2,'0') + '-' + String(nd.getDate()).padStart(2,'0');
+        var newMt = { id: uid('mt'), date: ds, title: '', attendees: [], location: '', notes: '', announcements: '', issues: [], shares: {}, decisions: [], specials: [] };
+        state.meetings.push(newMt);
+        state.currentMeetingId = newMt.id;
+        save(KEYS.meetings, state.meetings); save(KEYS.currentMeeting, newMt.id);
+        renderMeetings();
+        setTimeout(function () { var t = document.querySelector('.mt-page-title'); if (t) t.focus(); }, 80);
+      }
+
+      function makeTextarea(value, rows) {
         var t = document.createElement('textarea');
         t.value = value || '';
         t.rows = rows || 3;
@@ -3184,7 +3274,7 @@
       $('addGoalBtn').addEventListener('click', function (e) { e.stopPropagation(); openGoalModal(null); });
       $('addEventBtn').addEventListener('click', function () { openEventModal(null); });
       $('addFolderBtn').addEventListener('click', function () { openFolderModal(null); });
-      $('addMeetingBtn').addEventListener('click', function () { openMeetingModal(null); });
+      $('addMeetingBtn').addEventListener('click', function () { createBlankMeeting(); });
       $('brandHome').addEventListener('click', function () { setView('dashboardView'); });
       $('memoMoreBtn').addEventListener('click', function () {
         if (!state.user) return;
