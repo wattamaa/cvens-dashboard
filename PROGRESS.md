@@ -557,6 +557,18 @@ state.events = state.events.map(e => {
 - **타임라인 드래그 핸들**: 각 .t-bar에 .t-handle.t-handle-l/-r 6px (hover시 표시). mousedown→document mousemove/up 사용. left/width % 조정 후 mouseup으로 date 환산 + state.events save + renderTimeline. .dragging 클래스 노란 outline
 - **타임라인 새 일정 버튼**: 마지막 줄 .t-row.t-row-add — 클릭시 today↝+7일 새 ev push + openEventModal.
 
+### 23단계: 팀원/의제/모달/회의록/메모 세부 리파인 (commit 19aa8ae)
+> 사용자 요청: 팀원구성 카드형 해제·아이콘+명대 / 팀목표 빈 체크리스트 → 0% / 체크리스트 추가 점선 + 버튼 / 메모… 메모 주 제목 + 설명 제거 / 삭제 버튼 정렬 / 회의록 첫 진입 점→ 닫힌 / + 버튼 새 큰 창 / 행 복사·삭제 / 메모는 대시보드 테이블에서만
+- **팀원 구성**: 카드 구조 제거. .team-cards row flex(space-around). .team-card 세로 정렬 (아바타 + 이름), absolute 위치의 .tc-bubble (위에 떨어진 말풍선 + ::after 꿐리).
+- **팀목표 진행률 0%**: checklist 빈 배열이면 progress 강제 0 (수동 g.progress 무시).
+- **체크리스트 추가 점선 버튼**: input 자리를 .cl-add-btn (dashed border)로. 클릭 → .cl-add-input 교체 + blur/Enter에 자동 저장, 빈값이면 버튼로 돌아감 / Esc 취소.
+- **목표 상세 모달 h3·sub 제거**: showModal에 title='' sub='' 전달 + .modal-card h3:empty/.sub:empty { display: none } CSS.
+- **삭제 버튼 정렬**: .modal-foot align-items: center + .btn-danger margin-right:auto/align-self:center 명시.
+- **회의록 첫 진입 닫힌**: renderMeetings 자동 currentMeetingId 설정 제거. 무효 id만 clear.
+- **회의록 새 큰 창**: showModal 옥션 wide:true → .modal-card.large (640px, 85vh, scroll). openMeetingModal에 적용.
+- **회의록 행 복사/삭제**: .ml-actions hover 표시, .ml-act (copy+휴지통). 복사는 deepClone + uid + 오늘 날짜 + "(복사)" suffix.
+- **메모 대시보드 전용**: setView 안에서 .memo display 토글 + .card gridTemplateColumns 조정 (260px 1fr [340px]).
+
 ---
 
-마지막 업데이트: 22단계 팀목표리스트화/자동진행률/상세인라인/메모인라인/user chip/타임라인드래그핸들+추가 완료.
+마지막 업데이트: 23단계 세부 리파인 (팀원·팀목표·모달·회의록·메모) 완료.
