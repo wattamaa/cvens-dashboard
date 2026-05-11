@@ -569,6 +569,15 @@ state.events = state.events.map(e => {
 - **회의록 행 복사/삭제**: .ml-actions hover 표시, .ml-act (copy+휴지통). 복사는 deepClone + uid + 오늘 날짜 + "(복사)" suffix.
 - **메모 대시보드 전용**: setView 안에서 .memo display 토글 + .card gridTemplateColumns 조정 (260px 1fr [340px]).
 
+### 24단계: 회의록 인라인 편집 + 빈 캐버스 + 폴더 + Quick Links 간소화 + badge 숨김 (commits 8d331fc / 5f73e64)
+> "회의록 이름·내용 바로 수정 / 새 회의는 빈 대지 / 폴더로 묶음 카드 / 퀸링크 알아서 지정 + 제목·링크 / Quick Links → 퀸 링크 / 소제목 옆 숫자 제거"
+- **회의록 전체 인라인 편집 (P8)**: makeEditable 헬퍼 — contentEditable + blur/Enter/Esc. 제목·날짜·참석자 토글·장소·특이·공지·이슈 list·공유 3명·결정·특이사항 모두 그 자리에서 수정. list 항목은 + 점선 버튼 + 자동 저장 (빈값이면 제거). buildMeetingDetail 재작성.
+- **새 회의 = 빈 캐버스 (P8)**: + 버튼 → createBlankMeeting() 즉시 빈 mt push + currentMeetingId 설정 + 제목 focus. 모달 안 쓴
+- **회의록 폴더 (P9)**: state.meetingFolders 신규 + cv_meeting_folders KEY + Firebase /cvens/meetingFolders + meeting.folderId 마이그레이션. toolbar 폴더 추가 버튼. renderMeetings 재작성 — 폴더 그룹 카드 + 안에 회의 list. 폴더 이름 변경·삭제 (내용 미분류 이동). 회의 행 hover 시 folder select dropdown
+- **Quick Links 간소화 (P9)**: openQuickLinkModal을 제목 + URL 2개 필드만。 아이콘/색 자동 랜덤 (ICON_KEYS/COLORS modulo). q.url 필드 마이그레이션. 일반 클릭 → window.open(url, _blank). 편집 모드만 모달.
+- **소제목 badge 숨김 (P9)**: .section-head .badge { display: none; } — 퀸링크/팀원구성/팀목표/타임라인 숫자 모두 제거.
+- **명칭 한글화 (P9)**: <h3>Quick Links</h3> → <h3>퀸 링크</h3>.
+
 ---
 
-마지막 업데이트: 23단계 세부 리파인 (팀원·팀목표·모달·회의록·메모) 완료.
+마지막 업데이트: 24단계 회의록인라인편집·폴더 + 퀸링크 간소화 + badge 숨김 완료.
