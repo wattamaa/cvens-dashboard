@@ -126,6 +126,39 @@
 - 더미 회의 3건 데이터.
 - 배경: Unsplash 거실 → **다크 라디알 그라데이션** (보라/네이비 spot + 검은 핵).
 
+### 18단계: 전반 점검 + 응급+잡결함 일괄 fix (commit d2ee457)
+> "지금 웹사이트 전체적으로 살펴봐 이슈있는 부분 세세하게 하나하나씩 클릭해보고, 그리고 실무진 입장에서 통상적으로 이건 이렇게 보완해야한다 이런부분도 전체 체크해"
+- 사이트 전체 코드/콘솔 점검 + 8개 패치 한 커밋:
+  1. **CRITICAL**: `var FIREBASE_PATHS` 호이스팅 (1782 선언, 1755 사용) → 페이지 로드 즉시 `Cannot set properties of undefined` 예외 → 콘텐츠 미렌더 + picker 미표시. 빈 선언을 채움 코드 위로 이동.
+  2. `.t-bar { overflow: hidden }` + `.t-actions { top:-10px; right:-10px }` 충돌로 편집 액션 버튼 잘림 → overflow: visible.
+  3. 사이드바 view-less 항목 클릭 시 active 강조가 대시보드로 옮결 → 클릭 항목 자체 active.
+  4. "모든 데이터 초기화" confirm 문구 누락 항목 추가 + Firebase 영향 안내.
+  5. 모달 Enter 키 저장 지원 (textarea는 줄바꿈 유지).
+  6. 전역 검색을 사이드바 트리/회의록 리스트까지 확장.
+  7. 죽은 `.icon-rail` CSS 블록 + responsive 셀렉터 모두 제거.
+  8. 알림 popover mock 3건 → "최근 활동 알림이 없습니다" 빈 상태.
+
+### 19단계: 타임라인 노션 스타일 재설계 (commit 02fa8d4)
+> "타임라인 원래 저런 형식 아니쟖아, 노션의 타임라인을 인용하고"
+- Gantt lane(자동 lane 할당) → Notion Timeline view식 1행 1항목 grid:
+  - 새 `.t-header` (200px 라벨 컬럼 + 시간축), `.t-rows` 컨테이너, `.t-row` (200px 1fr grid)
+  - 좌측 `.t-row-label`: `.t-cat-tag.cat-XX` 카테고리 태그 + `.t-row-name` 항목명
+  - 우측 `.t-row-track`: `.t-bar` 절대좌표 배치 (vertical center)
+  - 옷 `.t-lanes/.t-lane` CSS 제거
+- HTML: `<div class="t-lanes" id="tLanes">` → `<div class="t-rows" id="tRows">`. t-header 신설.
+- JS `renderTimeline()` 재작성: lane 알고리즘 제거, 정렬 후 1∶1 매핑. badge 'tasks' → '항목'.
+- `t-today` 좌표 라벨 컬럼 200px 보정.
+
+### 20단계: 회의록 리스트 accordion 인터랙션 (commit b43bc53)
+> "회의록도 원래 리스트 쑌라락 있고 그걸 클릭하면 나오는 형태 회의록도 수정 가능하게 해주고"
+- 회의 list + detail 항상 같이 보이던 구조 → accordion. 평소 리스트만, 행 클릭 시 그 아래 detail inline 펼침. 재클릭 시 닫힘.
+- 새 `.ml-row` wrapper, `.ml-detail` (display:none → active 시 block).
+- `.meeting-list` max-height 제거 (스크롤은 main이 처리).
+- `.ml-arrow` 기본 보이게 + active `▼` / 비활성 `▶`.
+- HTML: `<div class="meeting-page" id="meetingPage">` 제거.
+- `renderMeetings()` 재작성 + `buildMeetingDetail()` 분리. share 표는 동적 TEAM 참조.
+- 인라인 필드별 편집은 다음 단계로 미루었음 (toolbar 연필 버튼 모달은 그대로).
+
 ---
 
 ## 2. 디자인 원칙 (절대 깨면 안 됨)
@@ -504,4 +537,4 @@ state.events = state.events.map(e => {
 
 ---
 
-마지막 업데이트: 회의록 리스트·정렬·다크 그라데이션 + 안 먹던 버튼 모두 활성화 직후.
+마지막 업데이트: 18단계 응급+잡결함(8개) + 19단계 타임라인 노션스타일 + 20단계 회의록 accordion 환자 완료.
