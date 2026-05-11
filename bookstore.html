@@ -337,14 +337,7 @@
     letter-spacing: -0.01em;
     color: var(--text);
   }
-  .section-head .badge {
-    padding: 2px 10px;
-    font-size: 11.5px;
-    background: rgba(255,255,255,0.08);
-    border: 1px solid var(--glass-border);
-    border-radius: 999px;
-    color: var(--text-dim);
-  }
+  .section-head .badge { display: none; }
   .section-head .spacer { flex: 1; }
   .section-head .add-btn,
   .section-head .icon-btn-sm,
@@ -967,7 +960,29 @@
   }
   .ml-item:hover .ml-arrow { opacity: 1; }
   .ml-item.active .ml-arrow { opacity: 1; color: var(--text); }
-  .ml-actions { display: none; gap: 4px; margin-left: 4px; flex: 0 0 auto; }
+  /* meeting folder cards */
+  .meeting-folders { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
+  .mt-folder-group { display: flex; flex-direction: column; }
+  .mt-folder-head { display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); border-radius: 14px; cursor: pointer; transition: 160ms ease; }
+  .mt-folder-head:hover { background: rgba(255,255,255,0.09); border-color: var(--glass-border-strong); }
+  .mt-folder-group.expanded .mt-folder-head { border-bottom-left-radius: 0; border-bottom-right-radius: 0; }
+  .mt-folder-head .chev { width: 14px; height: 14px; color: var(--text-dim); transition: transform 200ms ease; flex: 0 0 auto; }
+  .mt-folder-group.expanded .mt-folder-head .chev { transform: rotate(90deg); }
+  .mt-folder-head .ic { font-size: 16px; flex: 0 0 auto; }
+  .mt-folder-head .name { flex: 1; font-size: 13.5px; color: var(--text); font-weight: 500; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .mt-folder-head .count { font-size: 11.5px; color: var(--text-dim); background: rgba(255,255,255,0.08); padding: 2px 8px; border-radius: 999px; flex: 0 0 auto; }
+  .mt-folder-actions { display: none; gap: 4px; flex: 0 0 auto; }
+  .mt-folder-head:hover .mt-folder-actions { display: flex; }
+  .mt-folder-act { width: 24px; height: 24px; border-radius: 7px; background: rgba(255,255,255,0.08); border: 1px solid var(--glass-border); color: var(--text-dim); display: grid; place-items: center; cursor: pointer; padding: 0; font-family: inherit; }
+  .mt-folder-act:hover { background: rgba(255,255,255,0.18); color: var(--text); }
+  .mt-folder-act svg { width: 11px; height: 11px; }
+  .mt-folder-act.danger:hover { background: rgba(220,90,90,0.45); color: #fff; }
+  .mt-folder-body { display: none; padding: 6px; background: rgba(255,255,255,0.02); border: 1px solid var(--glass-border); border-top: 0; border-radius: 0 0 14px 14px; margin-top: -1px; }
+  .mt-folder-group.expanded .mt-folder-body { display: flex; flex-direction: column; gap: 6px; }
+  .mt-folder-empty { padding: 12px 14px; color: var(--text-faint); font-size: 12.5px; font-style: italic; text-align: center; }
+  .ml-folder-select { background: rgba(255,255,255,0.08); border: 1px solid var(--glass-border); color: var(--text); border-radius: 6px; font-size: 11px; padding: 2px 6px; cursor: pointer; font-family: inherit; outline: 0; color-scheme: dark; max-width: 100px; }
+  .ml-folder-select option { background: #2a2a30; }
+  .ml-actions { display: none; gap: 4px; margin-left: 4px; flex: 0 0 auto; align-items: center; }
   .ml-item:hover .ml-actions { display: flex; }
   .ml-act { width: 24px; height: 24px; border-radius: 7px; background: rgba(255,255,255,0.08); border: 1px solid var(--glass-border); color: var(--text-dim); display: grid; place-items: center; cursor: pointer; padding: 0; flex: 0 0 auto; font-family: inherit; transition: 160ms ease; }
   .ml-act:hover { background: rgba(255,255,255,0.18); color: var(--text); }
@@ -1581,7 +1596,7 @@
         <!-- Quick Links (subsection) -->
         <section class="quick-links-section" id="qlSection">
           <header class="section-head">
-            <h3>Quick Links</h3>
+            <h3>퀸 링크</h3>
             <span class="badge" id="qlBadge">8</span>
             <div class="spacer"></div>
             <button class="edit-toggle" id="editQuickLinks" title="편집">
@@ -1663,6 +1678,9 @@
           <button class="sort-btn" id="sortMeetingBtn" title="정렬 토글">최신순 ↓</button>
           <button class="edit-toggle" id="editMeeting" title="현재 회의 편집">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17.5V20h2.5L17 9.5 14.5 7 4 17.5z"/><path d="M14 7l3 3"/></svg>
+          </button>
+          <button class="add-btn" id="addFolderBtnMt" title="새 폴더">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h5l2 2h7a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M12 11v6"/><path d="M9 14h6"/></svg>
           </button>
           <button class="add-btn" id="addMeetingBtn" title="새 회의">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
@@ -1796,7 +1814,7 @@
 
       // ---------- DEFAULTS ----------
       var DEFAULT_QUICKLINKS = [
-        { id: 'ql1', label: '예시 링크', icon: 'link', color: 'blue' }
+        { id: 'ql1', label: '예시 링크', icon: 'link', color: 'blue', url: 'https://example.com' }
       ];
       var DEFAULT_GOALS = [
         { id: 'g1', name: 'Q2 신규 사용자 1만명 달성',     progress: 67, members: ['고동기','이유민'] },
@@ -1891,7 +1909,8 @@
         view: 'cv_active_view',
         currentMeeting: 'cv_current_meeting',
         meetingSort: 'cv_meeting_sort',
-        statuses: 'cv_statuses'
+        statuses: 'cv_statuses',
+        meetingFolders: 'cv_meeting_folders'
       };
       var FIREBASE_PATHS = {};
       // Now populate FIREBASE_PATHS — only SHARED data goes to cloud.
@@ -1905,6 +1924,7 @@
       FIREBASE_PATHS[KEYS.sidebar]  = 'sidebar';
       FIREBASE_PATHS[KEYS.meetings] = 'meetings';
       FIREBASE_PATHS[KEYS.statuses] = 'statuses';
+      FIREBASE_PATHS[KEYS.meetingFolders] = 'meetingFolders';
       function load(key, fallback) {
         try {
           var raw = localStorage.getItem(key);
@@ -1938,7 +1958,8 @@
         activeView: load(KEYS.view, 'dashboardView'),
         currentMeetingId: load(KEYS.currentMeeting, null),
         meetingSortDesc: load(KEYS.meetingSort, true),
-        statuses: load(KEYS.statuses, DEFAULT_STATUSES)
+        statuses: load(KEYS.statuses, DEFAULT_STATUSES),
+        meetingFolders: load(KEYS.meetingFolders, [])
       };
       // migrate old single-date events → start/end pair
       // migrate goals: ensure checklist field exists
@@ -1947,6 +1968,12 @@
       // migrate memos: ensure replies array exists
       state.memos = state.memos.map(function (m) { if (!m.replies) m.replies = []; return m; });
       save(KEYS.memos, state.memos);
+      // migrate meetings: ensure folderId field exists
+      state.meetings = state.meetings.map(function (m) { if (m.folderId === undefined) m.folderId = null; return m; });
+      save(KEYS.meetings, state.meetings);
+      // migrate quick links: ensure url field exists
+      state.ql = state.ql.map(function (q) { if (q.url === undefined) q.url = ''; return q; });
+      save(KEYS.ql, state.ql);
             state.events = state.events.map(function (e) {
         if (e.date && !e.start) {
           return { id: e.id, title: e.title, category: e.category, start: e.date, end: e.date };
@@ -2031,6 +2058,7 @@
           btn.appendChild(del);
           btn.addEventListener('click', function () {
             if (btn.closest('.editing')) openQuickLinkModal(q);
+            else if (q.url) window.open(q.url, '_blank', 'noopener');
           });
           root.appendChild(btn);
         });
@@ -2038,81 +2066,27 @@
       }
 
       function openQuickLinkModal(existing) {
-        var data = existing ? Object.assign({}, existing) : { id: uid('ql'), label: '', icon: 'link', color: 'blue' };
-        var iconState = data.icon, colorState = data.color;
-
-        var iconGrid = el('div', { 'class': 'icon-grid' });
-        ICON_KEYS.forEach(function (k) {
-          var b = el('button', {
-            type: 'button',
-            'class': 'icon-pick' + (k === iconState ? ' on' : ''),
-            html: ICONS[k],
-            onclick: function () {
-              iconState = k;
-              iconGrid.querySelectorAll('.icon-pick').forEach(function (x, i) {
-                x.classList.toggle('on', ICON_KEYS[i] === k);
-              });
-            }
-          });
-          iconGrid.appendChild(b);
-        });
-
-        var colorRow = el('div', { 'class': 'toggle-list' });
-        COLORS.forEach(function (c) {
-          var s = el('button', {
-            type: 'button',
-            'class': 'toggle color-swatch' + (c === colorState ? ' on' : ''),
-            'aria-label': c,
-            style: { background: COLOR_GRADIENTS[c] },
-            onclick: function () {
-              colorState = c;
-              colorRow.querySelectorAll('.color-swatch').forEach(function (x, i) {
-                x.classList.toggle('on', COLORS[i] === c);
-              });
-            }
-          });
-          colorRow.appendChild(s);
-        });
-
-        var labelInput = el('input', { type: 'text', value: data.label, placeholder: '예: 캘린더' });
-
+        var data = existing ? Object.assign({}, existing) : { id: uid('ql'), label: '', url: '', icon: ICON_KEYS[Math.floor(Math.random() * ICON_KEYS.length)], color: COLORS[Math.floor(Math.random() * COLORS.length)] };
+        var labelInput = el('input', { type: 'text', value: data.label, placeholder: '예: 회사 노션' });
+        var urlInput = el('input', { type: 'url', value: data.url || '', placeholder: 'https://...' });
         var body = el('div');
-        body.appendChild(el('div', { 'class': 'field-group' }, [
-          el('label', null, '이름'),
-          labelInput
-        ]));
-        body.appendChild(el('div', { 'class': 'field-group' }, [
-          el('label', null, '아이콘'),
-          iconGrid
-        ]));
-        body.appendChild(el('div', { 'class': 'field-group' }, [
-          el('label', null, '색상'),
-          colorRow
-        ]));
-
+        body.appendChild(el('div', { 'class': 'field-group' }, [el('label', null, '제목'), labelInput]));
+        body.appendChild(el('div', { 'class': 'field-group' }, [el('label', null, '링크 (URL)'), urlInput]));
         showModal({
-          title: existing ? 'Quick Link 편집' : 'Quick Link 추가',
-          sub: '아이콘과 색상을 골라 빠른 진입을 만드세요.',
+          title: existing ? '퀸 링크 편집' : '퀸 링크 추가',
+          sub: existing ? '' : '아이콘·색은 자동 지정됩니다.',
           body: body,
           showDelete: !!existing,
           onDelete: function () {
             state.ql = state.ql.filter(function (x) { return x.id !== data.id; });
-            save(KEYS.ql, state.ql);
-            renderQuickLinks();
-            hideModal();
+            save(KEYS.ql, state.ql); renderQuickLinks(); hideModal();
           },
           onSave: function () {
             data.label = (labelInput.value || '').trim() || '바로가기';
-            data.icon = iconState;
-            data.color = colorState;
-            if (existing) {
-              state.ql = state.ql.map(function (x) { return x.id === data.id ? data : x; });
-            } else {
-              state.ql.push(data);
-            }
-            save(KEYS.ql, state.ql);
-            renderQuickLinks();
-            hideModal();
+            data.url = (urlInput.value || '').trim();
+            if (existing) state.ql = state.ql.map(function (x) { return x.id === data.id ? data : x; });
+            else state.ql.push(data);
+            save(KEYS.ql, state.ql); renderQuickLinks(); hideModal();
           }
         });
       }
@@ -2331,72 +2305,102 @@
         return byId || state.meetings.slice().sort(function (a, b) { return b.date.localeCompare(a.date); })[0];
       }
 
+      function renderMeetingRow(mt, container) {
+        var isActive = mt.id === state.currentMeetingId;
+        var rowWrap = el('div', { 'class': 'ml-row' + (isActive ? ' active' : '') });
+        var item = el('div', { 'class': 'ml-item' + (isActive ? ' active' : ''), 'data-id': mt.id, onclick: function () {
+          if (state.currentMeetingId === mt.id) state.currentMeetingId = null;
+          else state.currentMeetingId = mt.id;
+          save(KEYS.currentMeeting, state.currentMeetingId);
+          renderMeetings();
+        } });
+        item.appendChild(el('span', { 'class': 'ml-date' }, fmtMeetingDateLabel(mt.date)));
+        item.appendChild(el('span', { 'class': 'ml-title' }, mt.title || '제목 없음'));
+        var statBits = ['참석 ' + ((mt.attendees || []).length)];
+        if (mt.decisions && mt.decisions.length) statBits.push('결정 ' + mt.decisions.length);
+        if (mt.issues && mt.issues.length) statBits.push('이슈 ' + mt.issues.length);
+        item.appendChild(el('span', { 'class': 'ml-stats' }, statBits.join(' · ')));
+        var mlActs = el('div', { 'class': 'ml-actions' });
+        var sel = document.createElement('select');
+        sel.className = 'ml-folder-select';
+        sel.title = '폴더 지정';
+        sel.addEventListener('click', function (e) { e.stopPropagation(); });
+        sel.addEventListener('change', function (e) { e.stopPropagation(); mt.folderId = sel.value || null; save(KEYS.meetings, state.meetings); renderMeetings(); });
+        var noneOpt = document.createElement('option'); noneOpt.value = ''; noneOpt.textContent = '미분류'; sel.appendChild(noneOpt);
+        (state.meetingFolders || []).forEach(function (f) { var o = document.createElement('option'); o.value = f.id; o.textContent = f.name; sel.appendChild(o); });
+        sel.value = mt.folderId || '';
+        mlActs.appendChild(sel);
+        mlActs.appendChild(el('button', { type: 'button', 'class': 'ml-act ml-dup', title: '복사', onclick: function (e) {
+          e.stopPropagation();
+          var cp = JSON.parse(JSON.stringify(mt)); cp.id = uid('mt');
+          var nd = new Date(); cp.date = nd.getFullYear()+'-'+String(nd.getMonth()+1).padStart(2,'0')+'-'+String(nd.getDate()).padStart(2,'0');
+          cp.title = (mt.title || '회의록') + ' (복사)';
+          state.meetings.push(cp); state.currentMeetingId = cp.id;
+          save(KEYS.meetings, state.meetings); save(KEYS.currentMeeting, cp.id);
+          renderMeetings();
+        } }, [iconSvg(['M9 9h10v10H9z','M5 5h10v10H5z'])]));
+        mlActs.appendChild(el('button', { type: 'button', 'class': 'ml-act ml-del', title: '삭제', onclick: function (e) {
+          e.stopPropagation();
+          if (!confirm('"' + (mt.title || '회의록') + '" 회의록을 삭제할까요?')) return;
+          state.meetings = state.meetings.filter(function (x) { return x.id !== mt.id; });
+          if (state.currentMeetingId === mt.id) { state.currentMeetingId = null; save(KEYS.currentMeeting, null); }
+          save(KEYS.meetings, state.meetings);
+          renderMeetings();
+        } }, [iconSvg(['M3 6h18','M8 6V4h8v2','M6 6l1 14h10l1-14'])]));
+        item.appendChild(mlActs);
+        item.appendChild(el('span', { 'class': 'ml-arrow' }, isActive ? '▼' : '▶'));
+        rowWrap.appendChild(item);
+        if (isActive) { var detail = el('div', { 'class': 'ml-detail' }); buildMeetingDetail(detail, mt); rowWrap.appendChild(detail); }
+        container.appendChild(rowWrap);
+      }
+
       function renderMeetings() {
         var listEl = $('meetingList');
         listEl.innerHTML = '';
         $('sortMeetingBtn').textContent = state.meetingSortDesc ? '최신순 ↓' : '오래된순 ↑';
         $('meetingTitle').textContent = '회의록';
-        if (!state.meetings.length) {
+        var folders = state.meetingFolders || [];
+        if (!state.meetings.length && !folders.length) {
           listEl.appendChild(el('div', { 'class': 'ml-empty' }, '아직 회의록이 없습니다. 우측 + 버튼으로 새 회의를 추가하세요.'));
           return;
         }
-        var sorted = state.meetings.slice().sort(function (a, b) {
-          return state.meetingSortDesc ? b.date.localeCompare(a.date) : a.date.localeCompare(b.date);
+        if (state.currentMeetingId && !state.meetings.find(function (m) { return m.id === state.currentMeetingId; })) { state.currentMeetingId = null; save(KEYS.currentMeeting, null); }
+        var sortFn = function (a, b) { return state.meetingSortDesc ? b.date.localeCompare(a.date) : a.date.localeCompare(b.date); };
+        folders.forEach(function (folder) {
+          var group = el('div', { 'class': 'mt-folder-group' + (folder.expanded ? ' expanded' : '') });
+          var head = el('div', { 'class': 'mt-folder-head', onclick: function (e) { if (e.target.closest('.mt-folder-actions')) return; folder.expanded = !folder.expanded; group.classList.toggle('expanded'); save(KEYS.meetingFolders, state.meetingFolders); } });
+          var chev = iconSvg('M9 6l6 6-6 6'); chev.classList.add('chev'); head.appendChild(chev);
+          head.appendChild(el('span', { 'class': 'ic' }, '📁'));
+          head.appendChild(el('span', { 'class': 'name' }, folder.name));
+          var members = state.meetings.filter(function (m) { return m.folderId === folder.id; });
+          head.appendChild(el('span', { 'class': 'count' }, members.length + '건'));
+          var actions = el('div', { 'class': 'mt-folder-actions' });
+          actions.appendChild(el('button', { type: 'button', 'class': 'mt-folder-act', title: '이름 변경', onclick: function (e) { e.stopPropagation(); var nm = prompt('폴더 이름:', folder.name); if (nm !== null && nm.trim()) { folder.name = nm.trim(); save(KEYS.meetingFolders, state.meetingFolders); renderMeetings(); } } }, [iconSvg(['M4 17.5V20h2.5L17 9.5 14.5 7 4 17.5z','M14 7l3 3'])]));
+          actions.appendChild(el('button', { type: 'button', 'class': 'mt-folder-act danger', title: '삭제', onclick: function (e) { e.stopPropagation(); if (!confirm('"' + folder.name + '" 폴더를 삭제할까요? 안 회의들은 미분류로 이동됩니다.')) return; state.meetings.forEach(function (m) { if (m.folderId === folder.id) m.folderId = null; }); state.meetingFolders = state.meetingFolders.filter(function (x) { return x.id !== folder.id; }); save(KEYS.meetings, state.meetings); save(KEYS.meetingFolders, state.meetingFolders); renderMeetings(); } }, [iconSvg(['M3 6h18','M8 6V4h8v2','M6 6l1 14h10l1-14'])]));
+          head.appendChild(actions);
+          group.appendChild(head);
+          var body = el('div', { 'class': 'mt-folder-body' });
+          if (members.length === 0) body.appendChild(el('div', { 'class': 'mt-folder-empty' }, '이 폴더에 회의록이 없습니다.'));
+          else members.slice().sort(sortFn).forEach(function (mt) { renderMeetingRow(mt, body); });
+          group.appendChild(body);
+          listEl.appendChild(group);
         });
-        // first entry: keep currentMeetingId as-is (closed if null). Invalid id is cleared but no auto-expand.
-        if (state.currentMeetingId && !state.meetings.find(function (m) { return m.id === state.currentMeetingId; })) {
-          state.currentMeetingId = null;
-          save(KEYS.currentMeeting, null);
+        var unfiled = state.meetings.filter(function (m) { return !m.folderId || !folders.find(function (f) { return f.id === m.folderId; }); });
+        if (folders.length === 0) {
+          unfiled.slice().sort(sortFn).forEach(function (mt) { renderMeetingRow(mt, listEl); });
+        } else if (unfiled.length > 0) {
+          var miscGroup = el('div', { 'class': 'mt-folder-group expanded' });
+          var miscHead = el('div', { 'class': 'mt-folder-head', onclick: function () { miscGroup.classList.toggle('expanded'); } });
+          var miscChev = iconSvg('M9 6l6 6-6 6'); miscChev.classList.add('chev'); miscHead.appendChild(miscChev);
+          miscHead.appendChild(el('span', { 'class': 'ic' }, '📂'));
+          miscHead.appendChild(el('span', { 'class': 'name' }, '미분류'));
+          miscHead.appendChild(el('span', { 'class': 'count' }, unfiled.length + '건'));
+          miscGroup.appendChild(miscHead);
+          var miscBody = el('div', { 'class': 'mt-folder-body' });
+          unfiled.slice().sort(sortFn).forEach(function (mt) { renderMeetingRow(mt, miscBody); });
+          miscGroup.appendChild(miscBody);
+          listEl.appendChild(miscGroup);
         }
-        sorted.forEach(function (mt) {
-          var isActive = mt.id === state.currentMeetingId;
-          var rowWrap = el('div', { 'class': 'ml-row' + (isActive ? ' active' : '') });
-          var item = el('div', {
-            'class': 'ml-item' + (isActive ? ' active' : ''),
-            'data-id': mt.id,
-            onclick: function () {
-              if (state.currentMeetingId === mt.id) { state.currentMeetingId = null; }
-              else { state.currentMeetingId = mt.id; }
-              save(KEYS.currentMeeting, state.currentMeetingId);
-              renderMeetings();
-            }
-          });
-          item.appendChild(el('span', { 'class': 'ml-date' }, fmtMeetingDateLabel(mt.date)));
-          item.appendChild(el('span', { 'class': 'ml-title' }, mt.title));
-          var statBits = ['참석 ' + ((mt.attendees || []).length)];
-          if (mt.decisions && mt.decisions.length) statBits.push('결정 ' + mt.decisions.length);
-          if (mt.issues && mt.issues.length) statBits.push('이슈 ' + mt.issues.length);
-          item.appendChild(el('span', { 'class': 'ml-stats' }, statBits.join(' · ')));
-          var mlActs = el('div', { 'class': 'ml-actions' });
-          mlActs.appendChild(el('button', { type: 'button', 'class': 'ml-act ml-dup', title: '복사', onclick: function (e) {
-            e.stopPropagation();
-            var cp = JSON.parse(JSON.stringify(mt));
-            cp.id = uid('mt');
-            var nd = new Date(); cp.date = nd.getFullYear()+'-'+String(nd.getMonth()+1).padStart(2,'0')+'-'+String(nd.getDate()).padStart(2,'0');
-            cp.title = mt.title + ' (×­)­­'; cp.title = mt.title + ' (복사)';
-            state.meetings.push(cp);
-            state.currentMeetingId = cp.id;
-            save(KEYS.meetings, state.meetings); save(KEYS.currentMeeting, cp.id);
-            renderMeetings();
-          } }, [iconSvg(['M9 9h10v10H9z','M5 5h10v10H5z'])]));
-          mlActs.appendChild(el('button', { type: 'button', 'class': 'ml-act ml-del', title: '삭제', onclick: function (e) {
-            e.stopPropagation();
-            if (!confirm('"' + mt.title + '" 회의록을 삭제할까요?')) return;
-            state.meetings = state.meetings.filter(function (x) { return x.id !== mt.id; });
-            if (state.currentMeetingId === mt.id) { state.currentMeetingId = null; save(KEYS.currentMeeting, null); }
-            save(KEYS.meetings, state.meetings);
-            renderMeetings();
-          } }, [iconSvg(['M3 6h18','M8 6V4h8v2','M6 6l1 14h10l1-14'])]));
-          item.appendChild(mlActs);
-          item.appendChild(el('span', { 'class': 'ml-arrow' }, isActive ? '▼' : '▶'));
-          rowWrap.appendChild(item);
-          if (isActive) {
-            var detail = el('div', { 'class': 'ml-detail' });
-            buildMeetingDetail(detail, mt);
-            rowWrap.appendChild(detail);
-          }
-          listEl.appendChild(rowWrap);
-        });
       }
 
       function buildMeetingDetail(page, current) {
@@ -3275,6 +3279,7 @@
       $('addEventBtn').addEventListener('click', function () { openEventModal(null); });
       $('addFolderBtn').addEventListener('click', function () { openFolderModal(null); });
       $('addMeetingBtn').addEventListener('click', function () { createBlankMeeting(); });
+      if ($('addFolderBtnMt')) $('addFolderBtnMt').addEventListener('click', function () { var nm = prompt('\uc0c8 \ud3f4\ub354 \uc774\ub984:'); if (!nm || !nm.trim()) return; if (!state.meetingFolders) state.meetingFolders = []; state.meetingFolders.push({ id: uid('mtf'), name: nm.trim(), expanded: true }); save(KEYS.meetingFolders, state.meetingFolders); renderMeetings(); });
       $('brandHome').addEventListener('click', function () { setView('dashboardView'); });
       $('memoMoreBtn').addEventListener('click', function () {
         if (!state.user) return;
@@ -3532,6 +3537,7 @@
       STATE_PROP[KEYS.sidebar]  = 'sidebar';
       STATE_PROP[KEYS.meetings] = 'meetings';
       STATE_PROP[KEYS.statuses] = 'statuses';
+      STATE_PROP[KEYS.meetingFolders] = 'meetingFolders';
 
       var RENDER_FN = {};
       RENDER_FN[KEYS.ql]       = renderQuickLinks;
@@ -3542,6 +3548,7 @@
       RENDER_FN[KEYS.sidebar]  = renderSidebar;
       RENDER_FN[KEYS.meetings] = renderMeetings;
       RENDER_FN[KEYS.statuses] = renderTeam;
+      RENDER_FN[KEYS.meetingFolders] = renderMeetings;
 
       function attachFirebaseListeners() {
         if (!window.__cvDb) return;
