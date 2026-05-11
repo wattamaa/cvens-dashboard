@@ -578,6 +578,13 @@ state.events = state.events.map(e => {
 - **소제목 badge 숨김 (P9)**: .section-head .badge { display: none; } — 퀸링크/팀원구성/팀목표/타임라인 숫자 모두 제거.
 - **명칭 한글화 (P9)**: <h3>Quick Links</h3> → <h3>퀸 링크</h3>.
 
+### 25단계: 회의록 폴더 카드 그리드 + 드래그/드롭 이동 + 회의 제목 인라인 편집 (commit 8393f45)
+> "폴더는 라운드진 사각형 카드 / 드래그로 회의록 이동 / 회의 다른 필드도 수정"
+- **폴더 카드 그리드**: 기존 bar 형 .mt-folder-group/.mt-folder-head 제거 → .meeting-folders-grid (auto-fill, min 200px) + .mt-folder-card (둘근 사각 16px radius). 카드 클릭 → .expanded (grid-column: 1 / -1) 안 회의 list 표시. 한 번에 하나만 펼침. 이름/삭제 버튼 hover
+- **드래그 & 드롭**: ml-item draggable=true + dragstart/dragend. 폴더 카드 / 미분류 wrap에 dragover/leave/drop. drop 시 mt.folderId 갱신 + persist + re-render. 별도 dropdown(.ml-folder-select) 제거
+- **미분류 드롭 영역**: .mt-misc-wrap (dashed border → dragover 시 solid+아이콘 틴트). 폴더 있을 때만 등장
+- **회의 제목 인라인 편집**: .ml-title contentEditable=true + blur/Enter/Esc. 클릭/mousedown stopPropagation 하여 접기/펼침 트리거 방지. 수정 값이 원본과 다르면 mt.title 갱신 + save + renderMeetings
+
 ---
 
-마지막 업데이트: 24단계 회의록인라인편집·폴더 + 퀸링크 간소화 + badge 숨김 완료.
+마지막 업데이트: 25단계 폴더카드그리드 + 드래그드롭 + 회의제목 인라인 완료.
