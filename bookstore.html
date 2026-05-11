@@ -860,6 +860,17 @@
   .mt-date-line { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; padding-bottom: 14px; border-bottom: 1px solid rgba(255,255,255,0.06); }
   .mt-date-line input[type="date"] { background: transparent; border: 1px solid var(--glass-border); border-radius: 8px; color: var(--text); padding: 4px 8px; font-family: inherit; font-size: 12.5px; color-scheme: dark; outline: 0; }
   .mt-date-line input[type="date"]:focus { border-color: var(--accent-strong); }
+  .mt-body { min-height: 320px; padding: 14px 8px; outline: 0; color: var(--text); font-size: 13.5px; line-height: 1.7; border-radius: 8px; transition: background 160ms; }
+  .mt-body:focus { background: rgba(255,255,255,0.02); }
+  .mt-body:empty::before { content: attr(data-placeholder); color: var(--text-faint); font-style: italic; pointer-events: none; }
+  .mt-body h1 { font-size: 20px; font-weight: 600; margin: 16px 0 8px; color: var(--text); }
+  .mt-body h2 { font-size: 17px; font-weight: 600; margin: 14px 0 8px; color: var(--text); }
+  .mt-body h3 { font-size: 14px; font-weight: 600; margin: 12px 0 6px; color: var(--text-dim); }
+  .mt-body p { margin: 6px 0; }
+  .mt-body ul, .mt-body ol { padding-left: 24px; margin: 6px 0; }
+  .mt-body li { padding: 2px 0; }
+  .mt-body .callout { margin: 10px 0; }
+  .mt-body b, .mt-body strong { color: var(--text); font-weight: 600; }
   .mt-add { width: 100%; padding: 8px 12px; background: transparent; border: 1px dashed var(--glass-border); border-radius: 10px; color: var(--text-faint); font-size: 13px; cursor: pointer; font-family: inherit; display: flex; align-items: center; justify-content: center; gap: 4px; transition: 160ms ease; margin-top: 6px; }
   .mt-add:hover { border-color: var(--accent-strong); color: var(--text); background: rgba(255,255,255,0.04); }
   .mt-li { display: flex; align-items: flex-start; gap: 10px; padding: 4px 0 4px 18px; position: relative; }
@@ -1987,6 +1998,22 @@
       // migrate quick links: ensure url field exists
       state.ql = state.ql.map(function (q) { if (q.url === undefined) q.url = ''; return q; });
       save(KEYS.ql, state.ql);
+      // migrate meetings: build mt.body from legacy fields (run before rules/h2 default)
+      function __escapeHtml(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>'); }
+      state.meetings = state.meetings.map(function (m) {
+        if (m.body !== undefined && m.body !== null) return m;
+        var h = '';
+        if (m.rules && m.rules.length) { h += '<div class="callout co-gray"><span class="ico">📌</span><span>데일리 미팅 준수 사항</span></div>'; h += '<ul>' + m.rules.map(function(r){return '<li>'+__escapeHtml(r)+'</li>';}).join('') + '</ul>'; }
+        if (m.location || m.notes) { h += '<p><b>장소</b> ' + __escapeHtml(m.location || '') + '<br><b>특이사항</b> ' + __escapeHtml(m.notes || '없음') + '</p>'; }
+        if (m.announcements && m.announcements.trim()) { h += '<div class="callout co-blue"><span class="ico">📢</span><span>대표 공지 사항</span></div>'; h += '<p>' + __escapeHtml(m.announcements) + '</p>'; }
+        if (m.h2) h += '<h2>' + __escapeHtml(m.h2) + '</h2>';
+        if (m.issues && m.issues.length) { h += '<div class="callout co-red"><span class="ico">⚠️</span><span>팀 내 이슈 사항</span></div>'; h += '<ul>' + m.issues.map(function(x){return '<li>'+__escapeHtml(x)+'</li>';}).join('') + '</ul>'; }
+        if (m.shares && Object.keys(m.shares).length) { var hasAny = Object.keys(m.shares).some(function(k){return m.shares[k];}); if (hasAny) { h += '<div class="callout co-brown"><span class="ico">📍</span><span>팀원 별 공유 사항</span></div>'; Object.keys(m.shares).forEach(function (name) { var v = m.shares[name]; if (v) h += '<p><b>' + __escapeHtml(name) + '</b> ' + __escapeHtml(v) + '</p>'; }); } }
+        if ((m.decisions && m.decisions.length) || (m.specials && m.specials.length)) { h += '<div class="callout co-green"><span class="ico">💡</span><span>미팅 내 결정사항 및 특이사항</span></div>'; if (m.decisions && m.decisions.length) { h += '<h3>결정 사항</h3>'; h += '<ul>' + m.decisions.map(function(x){return '<li>'+__escapeHtml(x)+'</li>';}).join('') + '</ul>'; } if (m.specials && m.specials.length) { h += '<h3>특이사항</h3>'; h += '<ul>' + m.specials.map(function(x){return '<li>'+__escapeHtml(x)+'</li>';}).join('') + '</ul>'; } }
+        m.body = h;
+        return m;
+      });
+      save(KEYS.meetings, state.meetings);
       // migrate meetings: rules + h2 default fields
       state.meetings = state.meetings.map(function (m) {
         if (!m.rules) m.rules = [
@@ -2421,117 +2448,37 @@
 
       function buildMeetingDetail(page, current) {
         function persist() { save(KEYS.meetings, state.meetings); }
-        function makeEditable(elem, multiline, placeholder, onCommit) {
-          elem.contentEditable = 'true';
-          elem.spellcheck = false;
-          elem.setAttribute('data-editable', '1');
-          if (placeholder) elem.setAttribute('data-placeholder', placeholder);
-          var orig = elem.textContent;
-          elem.addEventListener('focus', function () { orig = elem.textContent; });
-          elem.addEventListener('keydown', function (e) {
-            if (e.key === 'Enter' && !multiline && !e.shiftKey) { e.preventDefault(); elem.blur(); }
-            else if (e.key === 'Escape') { e.preventDefault(); elem.textContent = orig; elem.blur(); }
-          });
-          elem.addEventListener('blur', function () { var v = elem.textContent; if (v !== orig) { onCommit(v); persist(); } });
-          return elem;
-        }
-        var team = (typeof TEAM !== 'undefined' ? TEAM : ['고동기','이유민','전민욱']);
-        // Title (inline editable)
         var titleH = el('div', { 'class': 'mt-page-title' }, current.title || '');
-        makeEditable(titleH, false, '제목 없음', function (v) { current.title = v.trim() || '제목 없음'; renderMeetings(); });
+        titleH.contentEditable = 'true';
+        titleH.spellcheck = false;
+        titleH.setAttribute('data-editable', '1');
+        titleH.setAttribute('data-placeholder', '제목 없음');
+        var origT = current.title || '';
+        titleH.addEventListener('focus', function () { origT = titleH.textContent; });
+        titleH.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); titleH.blur(); } else if (e.key === 'Escape') { e.preventDefault(); titleH.textContent = origT; titleH.blur(); } });
+        titleH.addEventListener('blur', function () { var v = (titleH.textContent || '').trim(); if (v !== (current.title || '')) { current.title = v; persist(); renderMeetings(); } });
         page.appendChild(titleH);
-        // Date + attendee count
         var dateLine = el('div', { 'class': 'mt-date-line' });
-        var dateI = document.createElement('input');
-        dateI.type = 'date'; dateI.value = current.date || '';
+        var dateI = document.createElement('input'); dateI.type = 'date'; dateI.value = current.date || '';
         dateI.addEventListener('change', function () { current.date = dateI.value; persist(); renderMeetings(); });
         dateLine.appendChild(dateI);
-        var attCount = el('span', { style: { fontSize: '12px', color: 'var(--text-dim)' } }, '참석 ' + (current.attendees || []).length + '명');
-        dateLine.appendChild(attCount);
-        page.appendChild(dateLine);
-        // Daily rules (fixed)
-        page.appendChild(makeCallout('co-gray', '📌', '데일리 미팅 준수 사항'));
-        var rulesSec = el('div', { 'class': 'm-section' });
-        if (!current.rules) current.rules = [];
-        var rulesUl = el('ul');
-        current.rules.forEach(function (text, idx) {
-          var li = el('li');
-          var sp = el('span', null, text);
-          makeEditable(sp, false, '항목 입력', function (v) { var nv = v.trim(); if (nv) current.rules[idx] = nv; else { current.rules.splice(idx, 1); renderMeetings(); } });
-          li.appendChild(sp);
-          rulesUl.appendChild(li);
-        });
-        rulesSec.appendChild(rulesUl);
-        var addRulesBtn = el('button', { type: 'button', 'class': 'mt-add', onclick: function () { current.rules.push(''); persist(); renderMeetings(); setTimeout(function () { var inps = document.querySelectorAll('.m-section ul li [data-editable]'); if (inps.length) inps[inps.length-1].focus(); }, 50); } }, '+ 준수 사항 추가');
-        rulesSec.appendChild(addRulesBtn);
-        page.appendChild(rulesSec);
-        // Meta block (attendees / location / notes)
-        var meta = el('div', { 'class': 'meta-list' });
-        var attLine = el('div'); attLine.appendChild(el('b', null, '미팅 참석자'));
-        var attBox = el('span', { style: { display: 'inline-flex', gap: '4px', flexWrap: 'wrap', verticalAlign: 'middle' } });
+        var team = (typeof TEAM !== 'undefined' ? TEAM : ['고동기','이유민','전민욱']);
         team.forEach(function (m) {
           var on = (current.attendees || []).indexOf(m) >= 0;
           var t = el('button', { type: 'button', 'class': 'toggle' + (on ? ' on' : ''), style: { padding: '2px 8px', fontSize: '11px' }, onclick: function () { if (!current.attendees) current.attendees = []; var idx = current.attendees.indexOf(m); if (idx >= 0) current.attendees.splice(idx, 1); else current.attendees.push(m); persist(); renderMeetings(); } }, m);
-          attBox.appendChild(t);
+          dateLine.appendChild(t);
         });
-        attLine.appendChild(attBox); meta.appendChild(attLine);
-        var locLine = el('div'); locLine.appendChild(el('b', null, '미팅 장소'));
-        var locSpan = el('span', null, current.location || '');
-        makeEditable(locSpan, false, '장소 입력', function (v) { current.location = v.trim(); });
-        locLine.appendChild(locSpan); meta.appendChild(locLine);
-        var noLine = el('div'); noLine.appendChild(el('b', null, '특이 사항'));
-        var noSpan = el('span', null, current.notes || '');
-        makeEditable(noSpan, false, '특이사항 없음', function (v) { current.notes = v.trim(); });
-        noLine.appendChild(noSpan); meta.appendChild(noLine);
-        page.appendChild(meta);
-        // 대표 공지 (multiline editable)
-        page.appendChild(makeCallout('co-blue', '📢', '대표 공지 사항'));
-        var ann = el('div', { 'class': 'm-section' });
-        var annP = el('p', { style: { whiteSpace: 'pre-wrap' } }, current.announcements || '');
-        makeEditable(annP, true, '공지 사항이 있으면 클릭해서 입력하세요.', function (v) { current.announcements = v; });
-        ann.appendChild(annP); page.appendChild(ann);
-        var h2Sec = el('div', { 'class': 'm-section' }); var h2El = el('h2', null, current.h2 || ''); makeEditable(h2El, false, '소제목 입력', function (v) { current.h2 = v; }); h2Sec.appendChild(h2El); page.appendChild(h2Sec);
-        function renderList(items, container) {
-          container.innerHTML = '';
-          items.forEach(function (text, idx) {
-            var li = el('div', { 'class': 'mt-li' });
-            var sp = el('span', null, text);
-            makeEditable(sp, false, '항목 입력', function (v) { var nv = v.trim(); if (nv) { items[idx] = nv; } else { items.splice(idx, 1); renderMeetings(); } });
-            li.appendChild(sp);
-            var del = el('button', { type: 'button', 'class': 'mt-li-del', title: '삭제', onclick: function () { items.splice(idx, 1); persist(); renderMeetings(); } }, '×');
-            li.appendChild(del); container.appendChild(li);
-          });
-          var addBtn = el('button', { type: 'button', 'class': 'mt-add', onclick: function () { items.push(''); persist(); renderMeetings(); setTimeout(function () { var allInputs = document.querySelectorAll('.mt-li [data-editable]'); if (allInputs.length) allInputs[allInputs.length - 1].focus(); }, 50); } }, '+ 항목 추가');
-          container.appendChild(addBtn);
-        }
-        // 이슈
-        page.appendChild(makeCallout('co-red', '⚠️', '팀 내 이슈 사항'));
-        var iss = el('div', { 'class': 'm-section' });
-        if (!current.issues) current.issues = [];
-        renderList(current.issues, iss); page.appendChild(iss);
-        // 공유
-        page.appendChild(makeCallout('co-brown', '📍', '팀원 별 공유 사항'));
-        var sharesSec = el('div', { 'class': 'm-section' });
-        var table = el('table', { 'class': 'share-table' });
-        var hr = el('tr', null, [el('th', null, '팀원'), el('th', null, '공유 내용')]);
-        table.appendChild(hr);
-        team.forEach(function (name) {
-          var r = el('tr'); r.appendChild(el('th', null, name));
-          var tdContent = el('div', null, (current.shares && current.shares[name]) || '');
-          makeEditable(tdContent, true, '공유 내용 입력', function (v) { if (!current.shares) current.shares = {}; current.shares[name] = v; });
-          var td = el('td'); td.appendChild(tdContent); r.appendChild(td); table.appendChild(r);
-        });
-        sharesSec.appendChild(table); page.appendChild(sharesSec);
-        // 결정 + 특이
-        page.appendChild(makeCallout('co-green', '💡', '미팅 내 결정사항 및 특이사항'));
-        var dec = el('div', { 'class': 'm-section' });
-        dec.appendChild(el('h3', null, '결정 사항'));
-        if (!current.decisions) current.decisions = [];
-        var decBox = el('div'); dec.appendChild(decBox); renderList(current.decisions, decBox);
-        dec.appendChild(el('h3', null, '특이사항'));
-        if (!current.specials) current.specials = [];
-        var spBox = el('div'); dec.appendChild(spBox); renderList(current.specials, spBox);
-        page.appendChild(dec);
+        page.appendChild(dateLine);
+        var body = document.createElement('div');
+        body.className = 'mt-body';
+        body.contentEditable = 'true';
+        body.spellcheck = false;
+        body.setAttribute('data-placeholder', '여기를 클릭해 자유롭게 작성하세요. Enter로 줄바꿈, 어디든 클릭해도 저장됩니다.');
+        body.innerHTML = current.body || '';
+        var saveTimer;
+        body.addEventListener('input', function () { clearTimeout(saveTimer); saveTimer = setTimeout(function () { current.body = body.innerHTML; save(KEYS.meetings, state.meetings); }, 600); });
+        body.addEventListener('blur', function () { clearTimeout(saveTimer); current.body = body.innerHTML; save(KEYS.meetings, state.meetings); });
+        page.appendChild(body);
       }
 
       function createBlankMeeting() {
