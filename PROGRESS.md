@@ -620,6 +620,11 @@ state.events = state.events.map(e => {
 - **표 기능**: 슬래시 popup에 `⊱ 표 (3×3)` 추가. <table class="mt-table"> + thead 1행 + tbody 2행 × 3열 (첫 행 th, 나머지 td). 모든 케이스 입력 가능. cell focus 시 엑센트 outline.
 - **CSS .mt-table**: width 100%, border-collapse, border var(--glass-border), padding 8/12, th 백그라운드 강조, td hover 틴트, focus 시 아콠트 outline.
 
+### 31단계: Slack 회의록 3건 import + 표 노션식 커스텀 (commits 1dc9063)
+> 사용자: "Slack 회의록 옮겨줘 / 표도 수정 가능하게"
+- **Slack import (P18)**: #01_크벤스-회의록 채널의 canvas 3건 (F0B1S4KBME3 260508 / F0B21FJ3MD1 260511 / F0B2VCFNCSZ 260511) read → mt.body HTML 수제작. 새 폴더 "데일리 회의록_5월" 생성. 팀원 별 공유 사항은 <table class="mt-table">으로 보존. Firebase 직접 push.
+- **표 우클릭 메뉴 (P19)**: body contextmenu 이벤트 → td/th 보이면 showTableMenu(cell, x, y, body). popup: 위·아래에 행 추가 / 좌·우에 열 추가 / 행 삭제 / 열 삭제 / 표 전체 삭제. ncols, insertRow, insertCol, deleteRow, deleteCol 헬퍼.
+
 ---
 
-마지막 업데이트: 30단계 슬래시 in-place + 표 추가 완료.
+마지막 업데이트: 31단계 Slack import + 표 커스텀 완료.
