@@ -921,6 +921,11 @@
   .slash-pop-item .icon { width: 28px; height: 28px; border-radius: 6px; background: rgba(255,255,255,0.08); display: grid; place-items: center; font-size: 14px; flex: 0 0 auto; }
   .slash-pop-item .label { flex: 1; }
   .slash-pop-item .hint { font-size: 10.5px; color: var(--text-faint); }
+  .mt-body table.mt-table { width: 100%; border-collapse: collapse; margin: 10px 0; }
+  .mt-body table.mt-table td, .mt-body table.mt-table th { border: 1px solid var(--glass-border); padding: 8px 12px; font-size: 13px; min-width: 80px; vertical-align: top; line-height: 1.5; }
+  .mt-body table.mt-table th { background: rgba(255,255,255,0.05); font-weight: 600; color: var(--text-dim); text-align: left; }
+  .mt-body table.mt-table tr:hover td { background: rgba(255,255,255,0.025); }
+  .mt-body table.mt-table td:focus, .mt-body table.mt-table th:focus { outline: 1px solid var(--accent-strong); outline-offset: -1px; background: rgba(120,160,220,0.08); }
   .mt-body .task { display: flex; align-items: flex-start; gap: 8px; padding: 2px 0; margin: 2px 0; }
   .mt-body .task input[type="checkbox"] { width: 16px; height: 16px; margin-top: 3px; cursor: pointer; accent-color: rgba(127,200,156,0.85); flex: 0 0 auto; }
   .mt-body .task > span { flex: 1; }
@@ -2656,13 +2661,42 @@
       function insertSlashItem(body, html) {
         var sel = window.getSelection(); if (sel.rangeCount === 0) return;
         var range = sel.getRangeAt(0);
-        try { range.setStart(range.startContainer, Math.max(0, range.startOffset - 1)); range.deleteContents(); } catch (err) {}
+        // 새 element fragment 준비
         var temp = document.createElement('div'); temp.innerHTML = html;
-        var first = temp.firstChild;
-        var frag = document.createDocumentFragment();
-        while (temp.firstChild) frag.appendChild(temp.firstChild);
-        range.insertNode(frag);
-        if (first) { var r2 = document.createRange(); r2.selectNodeContents(first); r2.collapse(false); sel.removeAllRanges(); sel.addRange(r2); }
+        var newEl = temp.firstChild; if (!newEl) { hideSlashPop(); return; }
+        // body 직계 자식 line block 찾기
+        var lineBlock = range.startContainer;
+        if (lineBlock.nodeType === 3) lineBlock = lineBlock.parentNode;
+        while (lineBlock && lineBlock !== body && lineBlock.parentNode && lineBlock.parentNode !== body) {
+          lineBlock = lineBlock.parentNode;
+        }
+        if (lineBlock && lineBlock !== body && lineBlock.parentNode === body) {
+          var stripped = (lineBlock.textContent || '').replace(/\//g, '').trim();
+          if (stripped === '') {
+            body.replaceChild(newEl, lineBlock);
+          } else {
+            // 기존 block의 입력 그대로 유지·끝 "/"과 그 뒤 단어 제거 + 새 element는 이어서 삽입
+            try {
+              if (range.startContainer.nodeType === 3) {
+                var t = range.startContainer.textContent;
+                var off = range.startOffset;
+                var slashIdx = t.lastIndexOf('/', off - 1);
+                if (slashIdx >= 0) range.startContainer.textContent = t.slice(0, slashIdx) + t.slice(off);
+              }
+            } catch (err) {}
+            lineBlock.parentNode.insertBefore(newEl, lineBlock.nextSibling);
+          }
+        } else {
+          // body 직계 block 못 찾음 — 기존 처리 (그 자리에 삽입)
+          try { range.setStart(range.startContainer, Math.max(0, range.startOffset - 1)); range.deleteContents(); } catch (err) {}
+          range.insertNode(newEl);
+        }
+        // cursor 새 element 안 (표는 첫 cell, 그 외 element 끝)
+        var r2 = document.createRange();
+        var firstCell = newEl.querySelector ? newEl.querySelector('td,th,li') : null;
+        if (firstCell) { r2.selectNodeContents(firstCell); r2.collapse(true); }
+        else { r2.selectNodeContents(newEl); r2.collapse(false); }
+        sel.removeAllRanges(); sel.addRange(r2);
         hideSlashPop();
         body.dispatchEvent(new Event('input'));
         body.focus();
@@ -2696,6 +2730,7 @@
           { ic: '📢', label: '파란 콜아웃 (공지)', html: '<div class="callout co-blue"><span class="ico">📢</span><span>공지</span></div>' },
           { ic: '⚠', label: '빨간 콜아웃 (이슈)', html: '<div class="callout co-red"><span class="ico">⚠️</span><span>이슈</span></div>' },
           { ic: '💡', label: '초록 콜아웃 (결정)', html: '<div class="callout co-green"><span class="ico">💡</span><span>결정</span></div>' },
+          { ic: '⊱', label: '표 (3×3)', html: '<table class="mt-table"><tbody><tr><th> </th><th> </th><th> </th></tr><tr><td> </td><td> </td><td> </td></tr><tr><td> </td><td> </td><td> </td></tr></tbody></table>' },
           { ic: '—', label: '구분선', html: '<hr>' }
         ];
         items.forEach(function (it, idx) {
