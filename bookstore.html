@@ -860,6 +860,17 @@
   .mt-date-line { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; padding-bottom: 14px; border-bottom: 1px solid rgba(255,255,255,0.06); }
   .mt-date-line input[type="date"] { background: transparent; border: 1px solid var(--glass-border); border-radius: 8px; color: var(--text); padding: 4px 8px; font-family: inherit; font-size: 12.5px; color-scheme: dark; outline: 0; }
   .mt-date-line input[type="date"]:focus { border-color: var(--accent-strong); }
+  /* P16: tree search + preview tooltip */
+  .mt-tree-search { padding: 4px 4px 8px; position: sticky; top: 0; background: linear-gradient(to bottom, rgba(35,35,42,0.95) 0%, rgba(35,35,42,0.85) 80%, transparent 100%); backdrop-filter: blur(20px); z-index: 3; margin-bottom: 2px; }
+  .mt-tree-search input { width: 100%; height: 30px; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); border-radius: 8px; padding: 0 28px 0 10px; color: var(--text); font-size: 12px; font-family: inherit; outline: 0; }
+  .mt-tree-search input:focus { border-color: var(--accent-strong); background: rgba(255,255,255,0.08); }
+  .mt-tree-search .clr { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); width: 18px; height: 18px; background: transparent; border: 0; color: var(--text-faint); cursor: pointer; padding: 0; font-size: 14px; line-height: 1; }
+  .mt-tree-search { position: relative; }
+  .mt-tree-item { position: relative; }
+  .mt-tree-item .preview-tt { display: none; position: absolute; left: 100%; top: 0; margin-left: 10px; width: 280px; padding: 10px 12px; background: rgba(35,35,42,0.95); backdrop-filter: blur(20px) saturate(160%); border: 1px solid var(--glass-border-strong); border-radius: 10px; font-size: 11.5px; line-height: 1.55; color: var(--text-dim); z-index: 50; box-shadow: 0 12px 30px rgba(0,0,0,0.5); pointer-events: none; white-space: normal; word-break: break-word; max-height: 200px; overflow: hidden; }
+  .mt-tree-item .preview-tt b { color: var(--text); font-weight: 500; }
+  .mt-tree-item:hover .preview-tt { display: block; }
+  .mt-tree-item.hidden { display: none; }
   /* P14: option A — tree + content layout */
   .mt-shell { display: grid; grid-template-columns: 260px 1fr; gap: 0; background: rgba(255,255,255,0.02); border: 1px solid var(--glass-border); border-radius: 14px; overflow: hidden; min-height: 540px; }
   .mt-tree { border-right: 1px solid var(--glass-border); padding: 10px 8px; overflow-y: auto; display: flex; flex-direction: column; gap: 2px; background: rgba(255,255,255,0.012); max-height: calc(100vh - 240px); }
@@ -1596,6 +1607,54 @@
     .quick-links { grid-template-columns: repeat(4, 1fr); }
     .brand { min-width: 200px; }
   }
+  /* P16: mobile responsive */
+  @media (max-width: 900px) {
+    .mt-shell { grid-template-columns: 1fr; min-height: auto; }
+    .mt-tree { max-height: 280px; border-right: 0; border-bottom: 1px solid var(--glass-border); }
+    .mt-content { padding: 20px 18px 30px; max-height: none; min-height: 380px; }
+    .mt-content-actions { top: 12px; right: 14px; opacity: 1; }
+    .mt-tree-item .preview-tt { display: none !important; }
+    .dashboard-row { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 720px) {
+    .card { grid-template-columns: 1fr !important; grid-template-rows: auto auto auto auto; grid-template-areas: "topbar" "sidebar" "main" "memo"; }
+    .topbar { flex-wrap: wrap; gap: 8px; padding: 10px 14px; height: auto; min-height: 56px; }
+    .brand { min-width: 0; flex: 0 0 auto; }
+    .brand h1 { font-size: 20px; letter-spacing: 0.12em; }
+    .global-search { max-width: 100%; flex: 1 0 60%; order: 3; }
+    .top-actions { margin-left: auto; }
+    .topbar .top-actions .user-chip .user-chip-name { display: none; }
+    .sidebar { padding: 14px 16px; max-height: 200px; overflow-y: auto; }
+    .main { padding: 14px 16px 20px; }
+    .memo { border-left: 0; border-top: 1px solid rgba(255,255,255,0.08); }
+    .thread { max-height: 280px; }
+    .quick-links { grid-template-columns: repeat(4, 1fr) !important; gap: 8px; }
+    .q-link .icon { width: 48px; height: 48px; }
+    .q-link .icon svg { width: 20px; height: 20px; }
+    .timeline .section-head { flex-wrap: wrap; }
+    .t-header, .t-row { grid-template-columns: 110px 1fr; }
+    .t-row-label { padding: 4px 8px; }
+    .team-cards { padding: 36px 4px 10px; gap: 8px; }
+    .team-card .avatar-lg { width: 44px; height: 44px; font-size: 16px; }
+    .team-card .tc-bubble { font-size: 10.5px; max-width: 140px; padding: 4px 10px; }
+    .goal-row { grid-template-columns: minmax(0, 1fr) auto auto; gap: 8px; padding: 8px 12px; }
+    .goal-row .gr-people { display: none; }
+    .modal-card { width: 92%; padding: 18px 16px; }
+    .modal-card.large { width: 96%; padding: 18px 16px; }
+    .search-results { left: 8px; width: calc(100% - 16px); }
+  }
+  @media (max-width: 480px) {
+    .quick-links { grid-template-columns: repeat(3, 1fr) !important; }
+    .global-search .kbd { display: none; }
+    .mt-tree { max-height: 220px; }
+    .mt-content { padding: 16px 14px 24px; }
+    .timeline .section-head .range-input { font-size: 10.5px; }
+    .timeline .section-head .range-input input { width: 100px; }
+    .t-header, .t-row { grid-template-columns: 90px 1fr; }
+    .t-row-name { font-size: 11.5px; }
+    .t-cat-tag { font-size: 8.5px; padding: 1px 5px; }
+    .mt-page-title { font-size: 18px; }
+  }
   @media (max-width: 960px) {
     .card {
       grid-template-columns: 1fr;
@@ -1988,7 +2047,8 @@
         currentMeeting: 'cv_current_meeting',
         meetingSort: 'cv_meeting_sort',
         statuses: 'cv_statuses',
-        meetingFolders: 'cv_meeting_folders'
+        meetingFolders: 'cv_meeting_folders',
+        miscName: 'cv_misc_name'
       };
       var FIREBASE_PATHS = {};
       // Now populate FIREBASE_PATHS — only SHARED data goes to cloud.
@@ -2003,6 +2063,7 @@
       FIREBASE_PATHS[KEYS.meetings] = 'meetings';
       FIREBASE_PATHS[KEYS.statuses] = 'statuses';
       FIREBASE_PATHS[KEYS.meetingFolders] = 'meetingFolders';
+      FIREBASE_PATHS[KEYS.miscName] = 'miscName';
       function load(key, fallback) {
         try {
           var raw = localStorage.getItem(key);
@@ -2037,7 +2098,8 @@
         currentMeetingId: null,
         meetingSortDesc: load(KEYS.meetingSort, true),
         statuses: load(KEYS.statuses, DEFAULT_STATUSES),
-        meetingFolders: load(KEYS.meetingFolders, [])
+        meetingFolders: load(KEYS.meetingFolders, []),
+        miscName: load(KEYS.miscName, '미분류')
       };
       // migrate old single-date events → start/end pair
       // migrate goals: ensure checklist field exists
@@ -2465,6 +2527,14 @@
         var folders = state.meetingFolders || [];
         if (state.currentMeetingId && !state.meetings.find(function (m) { return m.id === state.currentMeetingId; })) { state.currentMeetingId = null; save(KEYS.currentMeeting, null); }
         var sortFn = function (a, b) { return state.meetingSortDesc ? b.date.localeCompare(a.date) : a.date.localeCompare(b.date); };
+        var searchWrap = el('div', { 'class': 'mt-tree-search' });
+        var sInp = document.createElement('input');
+        sInp.type = 'text'; sInp.placeholder = '회의록 검색…';
+        sInp.value = window.__mtSearchQ || '';
+        sInp.addEventListener('input', function () { window.__mtSearchQ = sInp.value; filterTree(); });
+        searchWrap.appendChild(sInp);
+        if (sInp.value) { searchWrap.appendChild(el('button', { type: 'button', 'class': 'clr', title: '지우기', onclick: function () { sInp.value = ''; window.__mtSearchQ = ''; filterTree(); sInp.focus(); } }, '×')); }
+        tree.appendChild(searchWrap);
         function mkTreeItem(mt) {
           var item = el('div', { 'class': 'mt-tree-item' + (mt.id === state.currentMeetingId ? ' active' : ''), 'data-id': mt.id });
           item.draggable = true;
@@ -2475,7 +2545,24 @@
           item.appendChild(el('span', { 'class': 'date' }, fmtMeetingDateLabel(mt.date)));
           item.appendChild(el('span', { 'class': 'label' }, mt.title || '제목 없음'));
           item.title = (mt.title || '제목 없음') + ' (' + mt.date + ')';
+          var bodyText = (mt.body || '').replace(/<[^>]+>/g, ' ').replace(/&[^;]+;/g, ' ').replace(/\s+/g, ' ').trim();
+          var preview = el('div', { 'class': 'preview-tt' });
+          if (mt.title) preview.appendChild(el('b', null, mt.title));
+          if (bodyText) preview.appendChild(document.createTextNode((mt.title ? ' · ' : '') + bodyText.slice(0, 140) + (bodyText.length > 140 ? '…' : '')));
+          else if (!mt.title) preview.appendChild(el('span', { style: { fontStyle: 'italic', color: 'var(--text-faint)' } }, '본문 없음'));
+          item.appendChild(preview);
           return item;
+        }
+        function mkFolderName(initN, isMisc, folder) {
+          var nameEl = el('span', { 'class': 'name' }, initN);
+          nameEl.contentEditable = 'true'; nameEl.spellcheck = false;
+          var origN = initN;
+          nameEl.addEventListener('focus', function () { origN = nameEl.textContent; });
+          nameEl.addEventListener('click', function (e) { e.stopPropagation(); });
+          nameEl.addEventListener('mousedown', function (e) { e.stopPropagation(); });
+          nameEl.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); nameEl.blur(); } else if (e.key === 'Escape') { e.preventDefault(); nameEl.textContent = origN; nameEl.blur(); } });
+          nameEl.addEventListener('blur', function () { var v = (nameEl.textContent || '').trim(); if (isMisc) { if (v && v !== (state.miscName || '미분류')) { state.miscName = v; save(KEYS.miscName, state.miscName); renderMeetings(); } else nameEl.textContent = state.miscName || '미분류'; } else { if (v && v !== folder.name) { folder.name = v; save(KEYS.meetingFolders, state.meetingFolders); renderMeetings(); } else nameEl.textContent = folder.name; } });
+          return nameEl;
         }
         function renderTreeFolder(folder, members, isMisc) {
           var expanded = isMisc ? !!window.__miscExpanded : !!folder.expanded;
@@ -2483,29 +2570,14 @@
           var head = el('div', { 'class': 'mt-tree-folder' });
           var chev = iconSvg('M9 6l6 6-6 6'); chev.classList.add('chev'); head.appendChild(chev);
           head.appendChild(el('span', { 'class': 'ic' }, isMisc ? '📂' : '📁'));
-          var nameEl = el('span', { 'class': 'name' }, isMisc ? '미분류' : folder.name);
-          if (!isMisc) {
-            nameEl.contentEditable = 'true'; nameEl.spellcheck = false;
-            var origN = folder.name;
-            nameEl.addEventListener('focus', function () { origN = nameEl.textContent; });
-            nameEl.addEventListener('click', function (e) { e.stopPropagation(); });
-            nameEl.addEventListener('mousedown', function (e) { e.stopPropagation(); });
-            nameEl.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); nameEl.blur(); } else if (e.key === 'Escape') { e.preventDefault(); nameEl.textContent = origN; nameEl.blur(); } });
-            nameEl.addEventListener('blur', function () { var v = (nameEl.textContent || '').trim(); if (v && v !== folder.name) { folder.name = v; save(KEYS.meetingFolders, state.meetingFolders); renderMeetings(); } else nameEl.textContent = folder.name; });
-          }
-          head.appendChild(nameEl);
+          head.appendChild(mkFolderName(isMisc ? (state.miscName || '미분류') : folder.name, isMisc, folder));
           head.appendChild(el('span', { 'class': 'count' }, String(members.length)));
           if (!isMisc) {
             var actions = el('div', { 'class': 'mt-tree-folder-actions' });
-            actions.appendChild(el('button', { type: 'button', 'class': 'mt-tree-folder-act danger', title: '폴더 삭제', onclick: function (e) { e.stopPropagation(); if (!confirm('"' + folder.name + '" 폴더를 삭제할까요? 회의록은 미분류로 이동됩니다.')) return; state.meetings.forEach(function (m) { if (m.folderId === folder.id) m.folderId = null; }); state.meetingFolders = state.meetingFolders.filter(function (x) { return x.id !== folder.id; }); save(KEYS.meetings, state.meetings); save(KEYS.meetingFolders, state.meetingFolders); renderMeetings(); } }, [iconSvg(['M3 6h18','M8 6V4h8v2','M6 6l1 14h10l1-14'])]));
+            actions.appendChild(el('button', { type: 'button', 'class': 'mt-tree-folder-act danger', title: '폴더 삭제', onclick: function (e) { e.stopPropagation(); if (!confirm('"' + folder.name + '" 폴더를 삭제할까요? 회의록은 이동됩니다.')) return; state.meetings.forEach(function (m) { if (m.folderId === folder.id) m.folderId = null; }); state.meetingFolders = state.meetingFolders.filter(function (x) { return x.id !== folder.id; }); save(KEYS.meetings, state.meetings); save(KEYS.meetingFolders, state.meetingFolders); renderMeetings(); } }, [iconSvg(['M3 6h18','M8 6V4h8v2','M6 6l1 14h10l1-14'])]));
             head.appendChild(actions);
           }
-          head.addEventListener('click', function (e) {
-            if (e.target.closest('[contenteditable]') || e.target.closest('.mt-tree-folder-actions')) return;
-            if (isMisc) { window.__miscExpanded = !window.__miscExpanded; }
-            else { folder.expanded = !folder.expanded; save(KEYS.meetingFolders, state.meetingFolders); }
-            renderMeetings();
-          });
+          head.addEventListener('click', function (e) { if (e.target.closest('[contenteditable]') || e.target.closest('.mt-tree-folder-actions')) return; if (isMisc) { window.__miscExpanded = !window.__miscExpanded; } else { folder.expanded = !folder.expanded; save(KEYS.meetingFolders, state.meetingFolders); } renderMeetings(); });
           head.addEventListener('dragover', function (e) { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; head.classList.add('dragover'); });
           head.addEventListener('dragleave', function () { head.classList.remove('dragover'); });
           head.addEventListener('drop', function (e) { e.preventDefault(); head.classList.remove('dragover'); var mtId = e.dataTransfer.getData('text/plain'); var mt = state.meetings.find(function (m) { return m.id === mtId; }); if (mt) { mt.folderId = isMisc ? null : folder.id; if (!isMisc) folder.expanded = true; save(KEYS.meetings, state.meetings); if (!isMisc) save(KEYS.meetingFolders, state.meetingFolders); renderMeetings(); } });
@@ -2520,6 +2592,13 @@
         var unfiled = state.meetings.filter(function (m) { return !m.folderId || !folders.find(function (f) { return f.id === m.folderId; }); });
         if (folders.length === 0) { state.meetings.slice().sort(sortFn).forEach(function (mt) { tree.appendChild(mkTreeItem(mt)); }); }
         else if (unfiled.length > 0) { tree.appendChild(renderTreeFolder({ id: 'misc', expanded: !!window.__miscExpanded }, unfiled, true)); }
+        function filterTree() {
+          var q = (window.__mtSearchQ || '').trim().toLowerCase();
+          var items = tree.querySelectorAll('.mt-tree-item');
+          items.forEach(function (it) { var label = (it.querySelector('.label') || {}).textContent || ''; var pv = it.querySelector('.preview-tt') ? it.querySelector('.preview-tt').textContent : ''; var match = q === '' || label.toLowerCase().indexOf(q) !== -1 || pv.toLowerCase().indexOf(q) !== -1; it.classList.toggle('hidden', !match); });
+          if (q) tree.querySelectorAll('.mt-tree-folder-group').forEach(function (g) { var kids = g.querySelector('.mt-tree-children'); if (!kids) return; var hasVisible = false; kids.querySelectorAll('.mt-tree-item').forEach(function (it) { if (!it.classList.contains('hidden')) hasVisible = true; }); if (hasVisible) g.classList.add('expanded'); });
+        }
+        filterTree();
         var current = state.meetings.find(function (m) { return m.id === state.currentMeetingId; });
         if (current) {
           buildMeetingDetail(content, current);
@@ -3699,6 +3778,7 @@
       STATE_PROP[KEYS.meetings] = 'meetings';
       STATE_PROP[KEYS.statuses] = 'statuses';
       STATE_PROP[KEYS.meetingFolders] = 'meetingFolders';
+      STATE_PROP[KEYS.miscName] = 'miscName';
 
       var RENDER_FN = {};
       RENDER_FN[KEYS.ql]       = renderQuickLinks;
@@ -3710,6 +3790,8 @@
       RENDER_FN[KEYS.meetings] = renderMeetings;
       RENDER_FN[KEYS.statuses] = renderTeam;
       RENDER_FN[KEYS.meetingFolders] = renderMeetings;
+      RENDER_FN[KEYS.miscName] = renderMeetings;
+      RENDER_FN[KEYS.meetingFolders] = renderMeetings;
 
       function attachFirebaseListeners() {
         if (!window.__cvDb) return;
@@ -3720,16 +3802,24 @@
           window.__cvDb.ref('cvens/' + path).on('value', function (snap) {
             var val = snap.val();
             if (val === null || val === undefined) {
-              // Empty in cloud → push our current local state as initial value
-              window.__cvDb.ref('cvens/' + path).set(state[stateProp]).catch(function (e) {
-                console.warn('Initial push failed:', e);
-              });
+              window.__cvDb.ref('cvens/' + path).set(state[stateProp]).catch(function (e) { console.warn('Initial push failed:', e); });
               return;
             }
-            // Got cloud data — update local state, cache to localStorage, re-render
+            // P16: 사용자가 편집 중이면 그 회의 데이터는 로컬 우선 (cloud가 덮어쓰지 않게)
+            var ae = document.activeElement;
+            var isEditing = !!(ae && (ae.classList && (ae.classList.contains('mt-body') || ae.classList.contains('mt-page-title')) || ae.isContentEditable));
+            if (key === KEYS.meetings && isEditing && state.currentMeetingId && Array.isArray(val)) {
+              var editId = state.currentMeetingId;
+              var localMt = state.meetings && state.meetings.find(function (m) { return m.id === editId; });
+              if (localMt) {
+                var foundInVal = false;
+                val = val.map(function (m) { if (m.id === editId) { foundInVal = true; return localMt; } return m; });
+                if (!foundInVal) val.push(localMt);
+              }
+            }
             state[stateProp] = val;
             try { localStorage.setItem(key, JSON.stringify(val)); } catch (e) {}
-            if (renderFn) {
+            if (renderFn && !isEditing) {
               try { renderFn(); } catch (e) { console.warn('Render after sync failed:', e); }
             }
           }, function (err) {
