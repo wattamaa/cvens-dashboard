@@ -600,6 +600,12 @@ state.events = state.events.map(e => {
 - **체크박스 블록**: .task .done 클래스. input checkbox 클릭 시 text-decoration line-through.
 - **트리 드래그 상태**: .mt-tree-item.dragging opacity 0.4. 폴더 head .dragover 시 백색 틴트.
 
+### 28단계: 자동펼침 제거 + 슬래시 위치 fix + 콜아웃 색·아이콘 편집 (commits 2f482af / 4e8025e)
+> 사용자: "클릭 안 하면 상세 안 뜨게 / 슬래시 자꾸 상단 이스슈 / 콜아웃 색·아이콘 수정"
+- **자동 펼침 제거**: state.currentMeetingId 이기 값 load(KEYS.currentMeeting, null) → null 고정. 페이지 reload 시 이전 선택 제거 → 트리에서 클릭해야 대자시한림 펼침. save는 그대로 (세션 안에서 유지)
+- **슬래시 popup 위치 fix**: range.getClientRects()[0]를 먼저. 빈 collapsed range면 startContainer→parentElement의 rect. 그것도 없으면 body 좌상단 +16/24. 화면 하단 넘으면 아이템 위로 뒤집기
+- **콜아웃 색·아이콘 편집**: body mousedown 이벤트에서 .callout .ico 감지 → cursor 이동 차단 + showCalloutEditor() popup. 5색 동그라미 swatch (회·파·빨·갈·초) + 16개 아이콘 그리드 + 직접 입력
+
 ---
 
-마지막 업데이트: 27단계 회의록 노션식 트리+본문 + 슬래시 명령 완료.
+마지막 업데이트: 28단계 자동펼침제거+슬래시위치fix+콜아웃편집 완료.
