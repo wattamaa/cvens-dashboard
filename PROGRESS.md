@@ -606,6 +606,14 @@ state.events = state.events.map(e => {
 - **슬래시 popup 위치 fix**: range.getClientRects()[0]를 먼저. 빈 collapsed range면 startContainer→parentElement의 rect. 그것도 없으면 body 좌상단 +16/24. 화면 하단 넘으면 아이템 위로 뒤집기
 - **콜아웃 색·아이콘 편집**: body mousedown 이벤트에서 .callout .ico 감지 → cursor 이동 차단 + showCalloutEditor() popup. 5색 동그라미 swatch (회·파·빨·갈·초) + 16개 아이콘 그리드 + 직접 입력
 
+### 29단계: 모바일 반응형 + 트리 검색/호버 리뷰 + 미분류 이름 편집 + 사용자 수정 보호 (commit 37f8720)
+> 사용자: "모바일 완박 / 회의록 보완 / 미분류 이름 변경 / 수정한 게 자꾸 변함"
+- **모바일 반응형**: @media (max-width: 900px) — .mt-shell 1col stack (트리 위/본문 아래), .dashboard-row 1col. @media (≤720px) — .card grid 1col, topbar wrap, user-chip-name 숨김, .quick-links 4col, .t-row 110px+1fr, team-card avatar 44px, modal 92% 너비. @media (≤480px) — .quick-links 3col, range input 소형, 제목 글자 18px.
+- **트리 검색 (.mt-tree-search)**: sticky top, 30px input + 지우기 × 버튼. window.__mtSearchQ에 저장. filterTree() — label/preview 텍스트 substring match, 매칭 있는 폴더 자동 expand.
+- **호버 미리보기 (.preview-tt)**: 다 트리 항목 우측에 absolute popup. mt.body HTML 제거 후 140자 스니펫 + 제목 굵게. 호버 시만 표시.
+- **미분류 이름 변경**: state.miscName (KEYS.miscName / FIREBASE_PATHS / cv_misc_name) 신규. 마이그레이션 default '미분류'. 트리에서 미분류 너레 폴더명도 inline contentEditable.
+- **편집 중 데이터 보호 (핵심)**: Firebase listener 아 설택된 회의를 편집 중 (.mt-body / .mt-page-title focus) 이면 cloud에서 받은 그 회의 데이터는 로컬 데이터로 교체 (사용자 입력 보존). renderFn도 편집 중에는 skip → DOM 그대로 유지 → 사용자 blur 시 save 호출로 클라우드 푸시.
+
 ---
 
-마지막 업데이트: 28단계 자동펼침제거+슬래시위치fix+콜아웃편집 완료.
+마지막 업데이트: 29단계 모바일 + 트리 검색/호버 + 미분류 이름 + 편집 데이터 보호 완료.
