@@ -591,6 +591,15 @@ state.events = state.events.map(e => {
 - **P12**: 회의록 세션별 구조 제거 → .mt-body 단일 contentEditable. 기존 mt(rules/announcements/issues/shares/decisions/specials/h2/location/notes) 데이터는 마이그레이션으로 HTML callout/ul/p로 합쳐 mt.body에 옮김. 빈 회의는 완전 빈 캠버스 + placeholder. 자동 저장 (input → 600ms debounce, blur 즉시).
 - **P13 검수 fix**: 전역 검색 buildSearchResults가 mt.announcements/issues/decisions 등만 색인하고 있었음 → mt.body의 HTML 텍스트 추출 후 검색 추가 (`<tag>` / `&entity;` 변가 제거 후 substring match + snippet 50자).
 
+### 27단계: 회의록 노션식 좌측 트리 + 우측 본문 + 슬래시 명령 (commits 3585b67 / 438ab99)
+> 사용자: 옵션 A로 설정, 수정 및 커스텀 항목 피드백 / "노션보다 더 상회하게"
+- **layout 재설계 (P14a)**: 폴더 카드 grid 제거 → .mt-shell (260px 트리 + 1fr 본문). meetingView 내부 구조 교체. editMeeting 버튼 제거 (자유 편집이 인라인이라 불필요).
+- **좌측 트리 (.mt-tree)**: 폴더(chevron 펼침/접기) → 회의 항목. 폴더 타쟄 대문자 + 이름 인라인 contentEditable (Enter·Esc·blur). 폴더 헤더 dragover/drop → 회의 움. 합치면 폴더 자동 펼침. 폴더 없으면 회의는 트리 root에 직접 나열. 미분류는 폴더 있을 때만 등장.
+- **우측 본문 (.mt-content)**: 선택된 회의를 buildMeetingDetail로 읽어 표시. 서아 아무것도 선택되었다면 큰 이모지 + "새 회의 만들기" CTA. hover 시 우상단에 floating 복사/삭제 버튼.
+- **슬래시 명령 popup (P14b)**: 본문에서 "/" 입력 → 포테 뜨움. H1·H2·H3 / 글머리표 · 번호 리스트 / 체크박스 할 일 / 4종 콜아웃 (회·파·빨·초) / 구분선. mousedown으로 선택 → 이전 "/" 제거 + html 삽입 + 커서 아이템 끝. Esc 또는 외부 클릭으로 닫힘.
+- **체크박스 블록**: .task .done 클래스. input checkbox 클릭 시 text-decoration line-through.
+- **트리 드래그 상태**: .mt-tree-item.dragging opacity 0.4. 폴더 head .dragover 시 백색 틴트.
+
 ---
 
-마지막 업데이트: 26단계 회의록 자유편집본문 + 검수 fix 완료.
+마지막 업데이트: 27단계 회의록 노션식 트리+본문 + 슬래시 명령 완료.
