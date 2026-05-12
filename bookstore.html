@@ -2651,6 +2651,7 @@
         body.innerHTML = current.body || '';
         var saveTimer;
         body.addEventListener('mousedown', function (e) { var ico = e.target.closest('.callout .ico'); if (ico) { e.preventDefault(); showCalloutEditor(ico, body); } });
+        body.addEventListener('contextmenu', function (e) { var cell = e.target.closest('td, th'); if (cell && cell.closest('table.mt-table')) { e.preventDefault(); showTableMenu(cell, e.clientX, e.clientY, body); } });
         body.addEventListener('input', function (e) { if (e && e.inputType === 'insertText' && e.data === '/') showSlashPop(body); clearTimeout(saveTimer); saveTimer = setTimeout(function () { current.body = body.innerHTML; save(KEYS.meetings, state.meetings); }, 600); });
         body.addEventListener('keydown', function (e) { if (e.key === 'Escape') hideSlashPop(); });
         body.addEventListener('blur', function () { clearTimeout(saveTimer); current.body = body.innerHTML; save(KEYS.meetings, state.meetings); });
@@ -2774,6 +2775,37 @@
         input.style.cssText = 'width: calc(100% - 16px); margin: 4px 8px 8px; height: 28px; background: rgba(255,255,255,0.06); border: 1px solid var(--glass-border); border-radius: 6px; padding: 0 10px; color: var(--text); font-size: 12px; font-family: inherit; outline: 0;';
         input.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); var v = (input.value || '').trim(); if (v) { ico.textContent = v; body.dispatchEvent(new Event('input')); hideSlashPop(); } } });
         pop.appendChild(input);
+        document.body.appendChild(pop);
+        document.addEventListener('mousedown', __slashOutsideHandler, true);
+      }
+
+      function showTableMenu(cell, x, y, body) {
+        hideSlashPop();
+        var table = cell.closest('table');
+        var tr = cell.closest('tr');
+        var tbody = tr.parentNode;
+        var rowIdx = Array.prototype.indexOf.call(tbody.children, tr);
+        var colIdx = Array.prototype.indexOf.call(tr.children, cell);
+        var pop = document.createElement('div'); pop.id = 'slashPop'; pop.className = 'slash-pop';
+        pop.style.left = Math.min(window.innerWidth - 220, x) + 'px';
+        pop.style.top = Math.min(window.innerHeight - 320, y) + 'px';
+        pop.style.minWidth = '200px';
+        function makeRow(label, fn) { var row = el('div', { 'class': 'slash-pop-item' }); row.appendChild(el('div', { 'class': 'label' }, label)); row.addEventListener('mousedown', function (e) { e.preventDefault(); fn(); hideSlashPop(); body.dispatchEvent(new Event('input')); }); return row; }
+        function ncols() { return (tbody.rows && tbody.rows[0] ? tbody.rows[0].cells.length : (tbody.children[0] ? tbody.children[0].children.length : 1)); }
+        function insertRow(at) { var n = ncols(); var newTr = document.createElement('tr'); for (var i = 0; i < n; i++) { var td = document.createElement('td'); td.innerHTML = '&nbsp;'; newTr.appendChild(td); } var ref = tbody.children[at] || null; tbody.insertBefore(newTr, ref); }
+        function insertCol(at) { Array.prototype.forEach.call(table.querySelectorAll('tr'), function (tr2, idx) { var src = tr2.children[0]; var isHead = src && src.tagName === 'TH'; var cell2 = document.createElement(isHead ? 'th' : 'td'); cell2.innerHTML = '&nbsp;'; var ref = tr2.children[at] || null; tr2.insertBefore(cell2, ref); }); }
+        function deleteRow() { if (tbody.children.length <= 1) { table.remove(); } else { tr.remove(); } }
+        function deleteCol() { if (ncols() <= 1) { table.remove(); return; } Array.prototype.forEach.call(table.querySelectorAll('tr'), function (tr2) { if (tr2.children[colIdx]) tr2.children[colIdx].remove(); }); }
+        pop.appendChild(makeRow('⬆️ 위에 행 추가', function () { insertRow(rowIdx); }));
+        pop.appendChild(makeRow('⬇️ 아래에 행 추가', function () { insertRow(rowIdx + 1); }));
+        pop.appendChild(el('div', { style: { height: '1px', background: 'rgba(255,255,255,0.08)', margin: '4px 8px' } }));
+        pop.appendChild(makeRow('⬅️ 왼쪽에 열 추가', function () { insertCol(colIdx); }));
+        pop.appendChild(makeRow('➡️ 오른쪽에 열 추가', function () { insertCol(colIdx + 1); }));
+        pop.appendChild(el('div', { style: { height: '1px', background: 'rgba(255,255,255,0.08)', margin: '4px 8px' } }));
+        pop.appendChild(makeRow('🗑 행 삭제', function () { deleteRow(); }));
+        pop.appendChild(makeRow('🗑 열 삭제', function () { deleteCol(); }));
+        pop.appendChild(el('div', { style: { height: '1px', background: 'rgba(255,255,255,0.08)', margin: '4px 8px' } }));
+        pop.appendChild(makeRow('🗑 표 전체 삭제', function () { table.remove(); }));
         document.body.appendChild(pop);
         document.addEventListener('mousedown', __slashOutsideHandler, true);
       }
