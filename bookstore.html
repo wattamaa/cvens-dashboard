@@ -1981,14 +1981,9 @@
         { id: 'e8', start: '2026-06-08', end: '2026-06-26', title: '정식 출시 준비',      category: 'launch' }
       ];
       var DEFAULT_SIDEBAR = [
-        { id: 's1', label: 'Workspace', expanded: true, children: [
+        { id: 's1', label: 'TEAM CVENS', expanded: true, children: [
           { id: 'i_dash', label: '대시보드', view: 'dashboardView', count: null },
-          { id: 'i_meet', label: '회의록',   view: 'meetingView',   count: null },
-          { id: 'i_pop',  label: 'Popular',  count: null },
-          { id: 'i_all',  label: 'All items', count: null }
-        ]},
-        { id: 's2', label: 'Personal', expanded: false, children: [
-          { id: 'i_fav', label: 'Your favorite', count: null }
+          { id: 'i_meet', label: '회의록',   view: 'meetingView',   count: null }
         ]}
       ];
       var DEFAULT_MEETINGS = [
@@ -2160,6 +2155,18 @@
       });
       save(KEYS.events, state.events);
 
+      // P21: 1회용 사이드바 정리 — Popular/All items/Your favorite/Personal 제거
+      if (!localStorage.getItem('cv_mig_sidebar_v2')) {
+        state.sidebar = state.sidebar.map(function (f) {
+          f.children = (f.children || []).filter(function (it) { return it.label !== 'Popular' && it.label !== 'All items' && it.label !== 'Your favorite'; });
+          return f;
+        }).filter(function (f) {
+          if (f.label === 'Personal' && (!f.children || f.children.length === 0)) return false;
+          return true;
+        });
+        save(KEYS.sidebar, state.sidebar);
+        try { localStorage.setItem('cv_mig_sidebar_v2', '1'); } catch (e) {}
+      }
       // sidebar normalization: dedupe by view, then ensure 대시보드/회의록 exist exactly once
       (function migrateSidebar() {
         var seenViews = {};
