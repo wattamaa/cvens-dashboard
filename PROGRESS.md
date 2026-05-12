@@ -625,6 +625,12 @@ state.events = state.events.map(e => {
 - **Slack import (P18)**: #01_크벤스-회의록 채널의 canvas 3건 (F0B1S4KBME3 260508 / F0B21FJ3MD1 260511 / F0B2VCFNCSZ 260511) read → mt.body HTML 수제작. 새 폴더 "데일리 회의록_5월" 생성. 팀원 별 공유 사항은 <table class="mt-table">으로 보존. Firebase 직접 push.
 - **표 우클릭 메뉴 (P19)**: body contextmenu 이벤트 → td/th 보이면 showTableMenu(cell, x, y, body). popup: 위·아래에 행 추가 / 좌·우에 열 추가 / 행 삭제 / 열 삭제 / 표 전체 삭제. ncols, insertRow, insertCol, deleteRow, deleteCol 헬퍼.
 
+### 32단계: 노션식 + 버튼 + Ctrl+V 링크 임베드 + 사이드바 정리 (commits 6757de1 / 8e359a1)
+> 사용자: "콜아웃 사이드 줄 추가 / 관련 글자 링크 넘김 / Popular All items Personal 쟐소
+- **행 좌측 + 버튼 (P20)**: 관함 포인트 mt-body 어느 block + 움으로 hover 시 좌측 28px 환래에 작은 + (22px). 클릭 + 관함 block 아래에 빈 <p> 삽입 + cursor 자동. window.__mtBlockAddInit 과일회만 설치. document mousemove (mt-body 탐색 → 직계 자식 block 찾기). hideTimer 200ms.
+- **Ctrl+V 링크 임베드 (P20)**: body paste 이벤트 — sel.isCollapsed 아니고 클립보드가 ^https?:// 이면 e.preventDefault(). selected text를 <a href=URL target=_blank rel=noopener>텍스트</a>로 wrap. cursor a 뒤로. mt-body a CSS 일·이·설·정 (아지·직·설·정) 추가
+- **사이드바 정리 (P21)**: DEFAULT_SIDEBAR에서 Popular/All items 제거 + Personal 폴더 제거 + Workspace만 단독 (대시보드/회의록 자식 2개). 1회용 마이그레이션 cv_mig_sidebar_v2 flag로 새 사용자 기존 데이터 청소. 또한 Firebase /cvens/sidebar 동일 데이터 직접 set으로 청소.
+
 ---
 
-마지막 업데이트: 31단계 Slack import + 표 커스텀 완료.
+마지막 업데이트: 32단계 완료 — 노션식 + 버튼 / Ctrl+V 링크 / 사이드바 정리. 다음 세션으로 인계 준비.
