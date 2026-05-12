@@ -3403,10 +3403,7 @@
           renderMemos();
         }
       });
-      $('editMeeting').addEventListener('click', function () {
-        var mt = getCurrentMeeting();
-        if (mt) openMeetingModal(mt); else openMeetingModal(null);
-      });
+      if ($('editMeeting')) $('editMeeting').addEventListener('click', function () { var mt = getCurrentMeeting(); if (mt) openMeetingModal(mt); else openMeetingModal(null); });
       $('sortMeetingBtn').addEventListener('click', function () {
         state.meetingSortDesc = !state.meetingSortDesc;
         save(KEYS.meetingSort, state.meetingSortDesc);
