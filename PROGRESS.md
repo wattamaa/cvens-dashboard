@@ -614,6 +614,12 @@ state.events = state.events.map(e => {
 - **미분류 이름 변경**: state.miscName (KEYS.miscName / FIREBASE_PATHS / cv_misc_name) 신규. 마이그레이션 default '미분류'. 트리에서 미분류 너레 폴더명도 inline contentEditable.
 - **편집 중 데이터 보호 (핵심)**: Firebase listener 아 설택된 회의를 편집 중 (.mt-body / .mt-page-title focus) 이면 cloud에서 받은 그 회의 데이터는 로컬 데이터로 교체 (사용자 입력 보존). renderFn도 편집 중에는 skip → DOM 그대로 유지 → 사용자 blur 시 save 호출로 클라우드 푸시.
 
+### 30단계: 슬래시 in-place 적용 + 표 추가 (commit b021e86)
+> 사용자: "슬래시 하면 아래가 아닌 선택된 행 자리에 적용 / 표 기능"
+- **insertSlashItem 재작성**: 기존은 단순 "/" 제거 후 fragment 삽입으로 새 줄이 아래로 삽입 → 이제 body 직계 line block(p/div/etc) 찾아서 (a) block 텍스트 비어 있으면 통째 교체 (b) 있으면 마지막 "/" 글자만 제거 + 다음 형제로 삽입. cursor는 새 element 끝 (표는 첫 cell의 앞).
+- **표 기능**: 슬래시 popup에 `⊱ 표 (3×3)` 추가. <table class="mt-table"> + thead 1행 + tbody 2행 × 3열 (첫 행 th, 나머지 td). 모든 케이스 입력 가능. cell focus 시 엑센트 outline.
+- **CSS .mt-table**: width 100%, border-collapse, border var(--glass-border), padding 8/12, th 백그라운드 강조, td hover 틴트, focus 시 아콠트 outline.
+
 ---
 
-마지막 업데이트: 29단계 모바일 + 트리 검색/호버 + 미분류 이름 + 편집 데이터 보호 완료.
+마지막 업데이트: 30단계 슬래시 in-place + 표 추가 완료.
