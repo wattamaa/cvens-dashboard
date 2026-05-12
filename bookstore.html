@@ -2034,7 +2034,7 @@
         sidebar: load(KEYS.sidebar, DEFAULT_SIDEBAR),
         meetings: load(KEYS.meetings, DEFAULT_MEETINGS),
         activeView: load(KEYS.view, 'dashboardView'),
-        currentMeetingId: load(KEYS.currentMeeting, null),
+        currentMeetingId: null,
         meetingSortDesc: load(KEYS.meetingSort, true),
         statuses: load(KEYS.statuses, DEFAULT_STATUSES),
         meetingFolders: load(KEYS.meetingFolders, [])
@@ -2566,6 +2566,7 @@
         body.setAttribute('data-placeholder', '여기를 클릭해 자유롭게 작성하세요. Enter로 줄바꿈, 어디든 클릭해도 저장됩니다.');
         body.innerHTML = current.body || '';
         var saveTimer;
+        body.addEventListener('mousedown', function (e) { var ico = e.target.closest('.callout .ico'); if (ico) { e.preventDefault(); showCalloutEditor(ico, body); } });
         body.addEventListener('input', function (e) { if (e && e.inputType === 'insertText' && e.data === '/') showSlashPop(body); clearTimeout(saveTimer); saveTimer = setTimeout(function () { current.body = body.innerHTML; save(KEYS.meetings, state.meetings); }, 600); });
         body.addEventListener('keydown', function (e) { if (e.key === 'Escape') hideSlashPop(); });
         body.addEventListener('blur', function () { clearTimeout(saveTimer); current.body = body.innerHTML; save(KEYS.meetings, state.meetings); });
@@ -2590,11 +2591,21 @@
       function showSlashPop(body) {
         hideSlashPop();
         var sel = window.getSelection(); if (sel.rangeCount === 0) return;
-        var rect = sel.getRangeAt(0).getBoundingClientRect();
-        if (rect.left === 0 && rect.top === 0) rect = body.getBoundingClientRect();
+        var range = sel.getRangeAt(0);
+        var rect;
+        var rects = range.getClientRects();
+        if (rects.length > 0) rect = rects[0];
+        if (!rect || (rect.left === 0 && rect.top === 0)) {
+          var node = range.startContainer;
+          if (node && node.nodeType === 3) node = node.parentElement;
+          if (node) { var nr = node.getBoundingClientRect(); rect = { left: nr.left + 8, top: nr.top, bottom: nr.bottom, height: nr.height }; }
+        }
+        if (!rect || (rect.left === 0 && rect.top === 0)) { var br = body.getBoundingClientRect(); rect = { left: br.left + 16, top: br.top + 24, bottom: br.top + 48 }; }
         var pop = document.createElement('div'); pop.id = 'slashPop'; pop.className = 'slash-pop';
-        pop.style.left = Math.min(window.innerWidth - 260, rect.left) + 'px';
-        pop.style.top = (rect.bottom + 4) + 'px';
+        var topPos = rect.bottom + 4;
+        if (topPos + 320 > window.innerHeight) topPos = Math.max(8, rect.top - 320 - 4);
+        pop.style.left = Math.min(window.innerWidth - 260, Math.max(8, rect.left)) + 'px';
+        pop.style.top = topPos + 'px';
         var items = [
           { ic: 'H1', label: '큰 제목', html: '<h1>제목</h1>' },
           { ic: 'H2', label: '중제목', html: '<h2>중제목</h2>' },
@@ -2619,6 +2630,39 @@
         document.addEventListener('mousedown', __slashOutsideHandler, true);
       }
       function __slashOutsideHandler(e) { if (!e.target.closest('#slashPop')) { hideSlashPop(); document.removeEventListener('mousedown', __slashOutsideHandler, true); } }
+
+      function showCalloutEditor(ico, body) {
+        hideSlashPop();
+        var callout = ico.closest('.callout'); if (!callout) return;
+        var rect = ico.getBoundingClientRect();
+        var pop = document.createElement('div'); pop.id = 'slashPop'; pop.className = 'slash-pop';
+        pop.style.left = Math.min(window.innerWidth - 260, Math.max(8, rect.left)) + 'px';
+        pop.style.top = (rect.bottom + 6) + 'px';
+        pop.style.minWidth = '240px';
+        var colorRow = el('div', { style: { display: 'flex', gap: '8px', padding: '10px 12px', justifyContent: 'space-between' } });
+        var colors = [{cls:'co-gray',bg:'rgba(255,255,255,0.10)'},{cls:'co-blue',bg:'rgba(72,108,168,0.55)'},{cls:'co-red',bg:'rgba(168,72,72,0.55)'},{cls:'co-brown',bg:'rgba(120,80,40,0.55)'},{cls:'co-green',bg:'rgba(72,140,90,0.55)'}];
+        colors.forEach(function (c) {
+          var sw = el('button', { type: 'button', style: { width: '28px', height: '28px', borderRadius: '50%', background: c.bg, border: callout.classList.contains(c.cls) ? '2px solid var(--text)' : '1px solid var(--glass-border)', cursor: 'pointer', padding: '0' } });
+          sw.addEventListener('mousedown', function (e) { e.preventDefault(); ['co-gray','co-blue','co-red','co-brown','co-green'].forEach(function (k) { callout.classList.remove(k); }); callout.classList.add(c.cls); body.dispatchEvent(new Event('input')); hideSlashPop(); });
+          colorRow.appendChild(sw);
+        });
+        pop.appendChild(colorRow);
+        pop.appendChild(el('div', { style: { height: '1px', background: 'rgba(255,255,255,0.08)', margin: '4px 8px' } }));
+        var iconRow = el('div', { style: { display: 'grid', gridTemplateColumns: 'repeat(8, 1fr)', gap: '4px', padding: '6px 12px' } });
+        ['📌','📢','⚠','📍','💡','🎯','🔥','✅','📝','📊','📅','💬','🔔','⭐','🚀','✨'].forEach(function (icon) {
+          var btn = el('button', { type: 'button', style: { width: '28px', height: '28px', fontSize: '15px', background: 'rgba(255,255,255,0.06)', border: '1px solid var(--glass-border)', borderRadius: '6px', cursor: 'pointer', padding: '0' } }, icon);
+          btn.addEventListener('mousedown', function (e) { e.preventDefault(); ico.textContent = icon; body.dispatchEvent(new Event('input')); hideSlashPop(); });
+          iconRow.appendChild(btn);
+        });
+        pop.appendChild(iconRow);
+        var input = document.createElement('input');
+        input.type = 'text'; input.placeholder = '이모지 직접 입력 + Enter';
+        input.style.cssText = 'width: calc(100% - 16px); margin: 4px 8px 8px; height: 28px; background: rgba(255,255,255,0.06); border: 1px solid var(--glass-border); border-radius: 6px; padding: 0 10px; color: var(--text); font-size: 12px; font-family: inherit; outline: 0;';
+        input.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); var v = (input.value || '').trim(); if (v) { ico.textContent = v; body.dispatchEvent(new Event('input')); hideSlashPop(); } } });
+        pop.appendChild(input);
+        document.body.appendChild(pop);
+        document.addEventListener('mousedown', __slashOutsideHandler, true);
+      }
 
       function createBlankMeeting() {
         var nd = new Date();
